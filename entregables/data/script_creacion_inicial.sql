@@ -18,7 +18,7 @@ PRINT '========================================='
 GO
 
 -- Eliminar stored procedures si existen
-IF OBJECT_ID('NOMBRE_GRUPO.migrar_respuesta_encuesta', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_respuesta_encuesta;
+IF OBJECT_ID('FOR_Y_UN_IF.migrar_respuesta_encuesta', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_respuesta_encuesta;
 IF OBJECT_ID('FOR_Y_UN_IF.migrar_encuesta', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_encuesta;
 IF OBJECT_ID('FOR_Y_UN_IF.migrar_pago', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_pago;
 IF OBJECT_ID('FOR_Y_UN_IF.migrar_detalle_factura', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_detalle_factura;
@@ -82,7 +82,7 @@ PRINT 'Limpieza completada'
 GO
 
 /*******************************************************************************
- * PARTE 1: CREACI�N DEL ESQUEMA
+ * PARTE 1: CREACION DEL ESQUEMA
  ******************************************************************************/
 
 PRINT '========================================='
@@ -97,7 +97,7 @@ PRINT 'Esquema FOR_Y_UN_IF creado correctamente'
 GO
 
 /*******************************************************************************
- * PARTE 2: CREACI�N DE TABLAS - ENTIDADES PRINCIPALES
+ * PARTE 2: CREACION DE TABLAS - ENTIDADES PRINCIPALES
  ******************************************************************************/
 
 PRINT '========================================='
@@ -180,7 +180,7 @@ CREATE TABLE FOR_Y_UN_IF.curso (
 PRINT 'Tabla curso creada'
 GO
 
--- Tabla: CURSO_DIA (relaci�n N:M)
+-- Tabla: CURSO_DIA (relacion N:M)
 CREATE TABLE FOR_Y_UN_IF.curso_dia (
     curso_dia_id INT IDENTITY(1,1) PRIMARY KEY,
     curso_codigo BIGINT NOT NULL,
@@ -207,7 +207,7 @@ PRINT 'Tabla modulo creada'
 GO
 
 /*******************************************************************************
- * PARTE 3: CREACI�N DE TABLAS - INSCRIPCIONES Y EVALUACIONES
+ * PARTE 3: CREACION DE TABLAS - INSCRIPCIONES Y EVALUACIONES
  ******************************************************************************/
 
 PRINT '========================================='
@@ -314,7 +314,7 @@ GO
 
 
 /*******************************************************************************
- * PARTE 4: CREACI�N DE TABLAS - FINALES
+ * PARTE 4: CREACION DE TABLAS - FINALES
  ******************************************************************************/
 
 PRINT '========================================='
@@ -365,7 +365,7 @@ PRINT 'Tabla evaluacion_final creada'
 GO
 
 /*******************************************************************************
- * PARTE 5: CREACI�N DE TABLAS - PAGOS Y FACTURACI�N
+ * PARTE 5: CREACION DE TABLAS - PAGOS Y FACTURACION
  ******************************************************************************/
 
 PRINT '========================================='
@@ -439,7 +439,7 @@ GO
 
 
 /*******************************************************************************
- * PARTE 6: CREACI�N DE TABLAS - ENCUESTAS
+ * PARTE 6: CREACION DE TABLAS - ENCUESTAS
  ******************************************************************************/
 
 PRINT '========================================='
@@ -556,24 +556,24 @@ GO
  * SP 1: MIGRACION DE CATALOGOS
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_catalogos
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_catalogos
 AS
 BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
-        PRINT 'Migrando cat�logos...'
+        PRINT 'Migrando catalogos...'
 
         -- CATEGORIA
-        INSERT INTO NOMBRE_GRUPO.categoria (categoria_nombre)
+        INSERT INTO FOR_Y_UN_IF.categoria (categoria_nombre)
         SELECT DISTINCT Curso_Categoria
         FROM gd_esquema.Maestra
         WHERE Curso_Categoria IS NOT NULL
 
-        PRINT 'Categor�as migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
+        PRINT 'Categorias migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
         -- TURNO
-        INSERT INTO NOMBRE_GRUPO.turno (turno_nombre)
+        INSERT INTO FOR_Y_UN_IF.turno (turno_nombre)
         SELECT DISTINCT Curso_Turno
         FROM gd_esquema.Maestra
         WHERE Curso_Turno IS NOT NULL
@@ -581,16 +581,16 @@ BEGIN
         PRINT 'Turnos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
         -- DIA
-        INSERT INTO NOMBRE_GRUPO.dia (dia_nombre)
+        INSERT INTO FOR_Y_UN_IF.dia (dia_nombre)
         SELECT DISTINCT TRIM(value)
         FROM gd_esquema.Maestra
         CROSS APPLY STRING_SPLIT(Curso_Dia, ',')
         WHERE Curso_Dia IS NOT NULL
 
-        PRINT 'D�as migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
+        PRINT 'Dias migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
         -- MEDIO_PAGO
-        INSERT INTO NOMBRE_GRUPO.medio_pago (medio_pago_nombre)
+        INSERT INTO FOR_Y_UN_IF.medio_pago (medio_pago_nombre)
         SELECT DISTINCT Pago_MedioPago
         FROM gd_esquema.Maestra
         WHERE Pago_MedioPago IS NOT NULL
@@ -598,17 +598,17 @@ BEGIN
         PRINT 'Medios de pago migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
         -- PERIODO
-        INSERT INTO NOMBRE_GRUPO.periodo (periodo_anio, periodo_mes)
+        INSERT INTO FOR_Y_UN_IF.periodo (periodo_anio, periodo_mes)
         SELECT DISTINCT Periodo_Anio, Periodo_Mes
         FROM gd_esquema.Maestra
         WHERE Periodo_Anio IS NOT NULL
           AND Periodo_Mes IS NOT NULL
         ORDER BY Periodo_Anio, Periodo_Mes
 
-        PRINT 'Per�odos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
+        PRINT 'Periodos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
         -- PREGUNTA_ENCUESTA
-        INSERT INTO NOMBRE_GRUPO.pregunta_encuesta (pregunta_texto)
+        INSERT INTO FOR_Y_UN_IF.pregunta_encuesta (pregunta_texto)
         SELECT DISTINCT pregunta
         FROM (
             SELECT Encuesta_Pregunta1 AS pregunta FROM gd_esquema.Maestra WHERE Encuesta_Pregunta1 IS NOT NULL
@@ -621,7 +621,7 @@ BEGIN
         ) AS preguntas
 
         PRINT 'Preguntas de encuesta migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
-        PRINT 'Cat�logos migrados exitosamente'
+        PRINT 'Catalogos migrados exitosamente'
 
     END TRY
     BEGIN CATCH
@@ -632,10 +632,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 2: MIGRACI�N DE PROVINCIA
+ * SP 2: MIGRACION DE PROVINCIA
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_provincia
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_provincia
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -643,7 +643,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando provincias...'
 
-        INSERT INTO NOMBRE_GRUPO.provincia (provincia_nombre)
+        INSERT INTO FOR_Y_UN_IF.provincia (provincia_nombre)
         SELECT DISTINCT provincia
         FROM (
             SELECT Alumno_Provincia AS provincia
@@ -670,10 +670,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 3: MIGRACI�N DE LOCALIDAD
+ * SP 3: MIGRACION DE LOCALIDAD
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_localidad
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_localidad
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -681,7 +681,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando localidades...'
 
-        INSERT INTO NOMBRE_GRUPO.localidad (localidad_nombre, provincia_id)
+        INSERT INTO FOR_Y_UN_IF.localidad (localidad_nombre, provincia_id)
         SELECT DISTINCT
             loc.localidad,
             p.provincia_id
@@ -698,7 +698,7 @@ BEGIN
             FROM gd_esquema.Maestra
             WHERE Sede_Localidad IS NOT NULL AND Sede_Provincia IS NOT NULL
         ) AS loc
-        JOIN NOMBRE_GRUPO.provincia p ON loc.provincia = p.provincia_nombre
+        JOIN FOR_Y_UN_IF.provincia p ON loc.provincia = p.provincia_nombre
 
         PRINT 'Localidades migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
@@ -711,10 +711,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 4: MIGRACI�N DE INSTITUCI�N
+ * SP 4: MIGRACION DE INSTITUCION
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_institucion
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_institucion
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -722,7 +722,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando instituciones...'
 
-        INSERT INTO NOMBRE_GRUPO.institucion (institucion_cuit, institucion_nombre, institucion_razon_social)
+        INSERT INTO FOR_Y_UN_IF.institucion (institucion_cuit, institucion_nombre, institucion_razon_social)
         SELECT DISTINCT
             Institucion_Cuit,
             Institucion_Nombre,
@@ -741,10 +741,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 5: MIGRACI�N DE SEDE
+ * SP 5: MIGRACION DE SEDE
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_sede
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_sede
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -752,7 +752,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando sedes...'
 
-        INSERT INTO NOMBRE_GRUPO.sede (
+        INSERT INTO FOR_Y_UN_IF.sede (
             sede_nombre,
             sede_direccion,
             sede_telefono,
@@ -768,9 +768,9 @@ BEGIN
             l.localidad_id,
             m.Institucion_Cuit
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.localidad l
+        JOIN FOR_Y_UN_IF.localidad l
             ON m.Sede_Localidad = l.localidad_nombre
-        JOIN NOMBRE_GRUPO.provincia p
+        JOIN FOR_Y_UN_IF.provincia p
             ON m.Sede_Provincia = p.provincia_nombre
             AND l.provincia_id = p.provincia_id
         WHERE m.Sede_Nombre IS NOT NULL
@@ -787,10 +787,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 6: MIGRACI�N DE PROFESOR
+ * SP 6: MIGRACION DE PROFESOR
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_profesor
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_profesor
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -798,7 +798,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando profesores...'
 
-        INSERT INTO NOMBRE_GRUPO.profesor (
+        INSERT INTO FOR_Y_UN_IF.profesor (
             profesor_dni,
             profesor_nombre,
             profesor_apellido,
@@ -818,9 +818,9 @@ BEGIN
             m.Profesor_Telefono,
             l.localidad_id
         FROM gd_esquema.Maestra m
-        LEFT JOIN NOMBRE_GRUPO.localidad l
+        LEFT JOIN FOR_Y_UN_IF.localidad l
             ON m.Profesor_Localidad = l.localidad_nombre
-        LEFT JOIN NOMBRE_GRUPO.provincia p
+        LEFT JOIN FOR_Y_UN_IF.provincia p
             ON m.Profesor_Provincia = p.provincia_nombre
             AND l.provincia_id = p.provincia_id
         WHERE m.Profesor_Dni IS NOT NULL
@@ -836,10 +836,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 7: MIGRACI�N DE ALUMNO
+ * SP 7: MIGRACION DE ALUMNO
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_alumno
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_alumno
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -847,7 +847,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando alumnos...'
 
-        INSERT INTO NOMBRE_GRUPO.alumno (
+        INSERT INTO FOR_Y_UN_IF.alumno (
             alumno_legajo,
             alumno_dni,
             alumno_nombre,
@@ -869,9 +869,9 @@ BEGIN
             m.Alumno_Telefono,
             l.localidad_id
         FROM gd_esquema.Maestra m
-        LEFT JOIN NOMBRE_GRUPO.localidad l
+        LEFT JOIN FOR_Y_UN_IF.localidad l
             ON m.Alumno_Localidad = l.localidad_nombre
-        LEFT JOIN NOMBRE_GRUPO.provincia p
+        LEFT JOIN FOR_Y_UN_IF.provincia p
             ON m.Alumno_Provincia = p.provincia_nombre
             AND l.provincia_id = p.provincia_id
         WHERE m.Alumno_Legajo IS NOT NULL
@@ -887,10 +887,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 8: MIGRACI�N DE CURSO
+ * SP 8: MIGRACION DE CURSO
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_curso
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_curso
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -898,7 +898,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando cursos...'
 
-        INSERT INTO NOMBRE_GRUPO.curso (
+        INSERT INTO FOR_Y_UN_IF.curso (
             curso_codigo,
             curso_nombre,
             curso_descripcion,
@@ -924,11 +924,11 @@ BEGIN
             t.turno_id,
             m.Profesor_Dni
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.sede s
+        JOIN FOR_Y_UN_IF.sede s
             ON m.Sede_Nombre = s.sede_nombre
-        JOIN NOMBRE_GRUPO.categoria c
+        JOIN FOR_Y_UN_IF.categoria c
             ON m.Curso_Categoria = c.categoria_nombre
-        JOIN NOMBRE_GRUPO.turno t
+        JOIN FOR_Y_UN_IF.turno t
             ON m.Curso_Turno = t.turno_nombre
         WHERE m.Curso_Codigo IS NOT NULL
           AND m.Profesor_Dni IS NOT NULL
@@ -944,29 +944,29 @@ END
 GO
 
 /*******************************************************************************
- * SP 9: MIGRACI�N DE CURSO_DIA
+ * SP 9: MIGRACION DE CURSO_DIA
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_curso_dia
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_curso_dia
 AS
 BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
-        PRINT 'Migrando relaci�n curso-d�a...'
+        PRINT 'Migrando relacion curso-dia...'
 
-        INSERT INTO NOMBRE_GRUPO.curso_dia (curso_codigo, dia_id)
+        INSERT INTO FOR_Y_UN_IF.curso_dia (curso_codigo, dia_id)
         SELECT DISTINCT
             m.Curso_Codigo,
             d.dia_id
         FROM gd_esquema.Maestra m
         CROSS APPLY STRING_SPLIT(m.Curso_Dia, ',') AS split_dias
-        JOIN NOMBRE_GRUPO.dia d
+        JOIN FOR_Y_UN_IF.dia d
             ON TRIM(split_dias.value) = d.dia_nombre
         WHERE m.Curso_Codigo IS NOT NULL
           AND m.Curso_Dia IS NOT NULL
 
-        PRINT 'Relaciones curso-d�a migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
+        PRINT 'Relaciones curso-dia migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
     END TRY
     BEGIN CATCH
@@ -977,18 +977,18 @@ END
 GO
 
 /*******************************************************************************
- * SP 10: MIGRACI�N DE M�DULO
+ * SP 10: MIGRACION DE MODULO
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_modulo
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_modulo
 AS
 BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
-        PRINT 'Migrando m�dulos...'
+        PRINT 'Migrando modulos...'
 
-        INSERT INTO NOMBRE_GRUPO.modulo (
+        INSERT INTO FOR_Y_UN_IF.modulo (
             modulo_nombre,
             modulo_descripcion,
             curso_codigo
@@ -1001,7 +1001,7 @@ BEGIN
         WHERE m.Modulo_Nombre IS NOT NULL
           AND m.Curso_Codigo IS NOT NULL
 
-        PRINT 'M�dulos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
+        PRINT 'Modulos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
     END TRY
     BEGIN CATCH
@@ -1012,10 +1012,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 11: MIGRACI�N DE INSCRIPCI�N
+ * SP 11: MIGRACION DE INSCRIPCION
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_inscripcion
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_inscripcion
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1023,7 +1023,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando inscripciones...'
 
-        INSERT INTO NOMBRE_GRUPO.inscripcion (
+        INSERT INTO FOR_Y_UN_IF.inscripcion (
             inscripcion_numero,
             inscripcion_fecha,
             inscripcion_estado,
@@ -1054,10 +1054,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 12: MIGRACI�N DE EVALUACI�N CURSO
+ * SP 12: MIGRACION DE EVALUACION CURSO
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_evaluacion_curso
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_evaluacion_curso
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1065,7 +1065,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando evaluaciones de curso...'
 
-        INSERT INTO NOMBRE_GRUPO.evaluacion_curso (
+        INSERT INTO FOR_Y_UN_IF.evaluacion_curso (
             evaluacion_nota,
             evaluacion_fecha,
             evaluacion_instancia,
@@ -1081,7 +1081,7 @@ BEGIN
             m.Inscripcion_Numero,
             mo.modulo_id
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.modulo mo
+        JOIN FOR_Y_UN_IF.modulo mo
             ON m.Modulo_Nombre = mo.modulo_nombre
             AND m.Curso_Codigo = mo.curso_codigo
         WHERE m.Evaluacion_Curso_fechaEvaluacion IS NOT NULL
@@ -1099,18 +1099,18 @@ END
 GO
 
 /*******************************************************************************
- * SP 13: MIGRACI�N DE TRABAJO PR�CTICO
+ * SP 13: MIGRACION DE TRABAJO PRACTICO
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_trabajo_practico
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_trabajo_practico
 AS
 BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
-        PRINT 'Migrando trabajos pr�cticos...'
+        PRINT 'Migrando trabajos practicos...'
 
-        INSERT INTO NOMBRE_GRUPO.trabajo_practico (
+        INSERT INTO FOR_Y_UN_IF.trabajo_practico (
             trabajo_practico_nota,
             trabajo_practico_fecha_evaluacion,
             inscripcion_numero
@@ -1123,7 +1123,7 @@ BEGIN
         WHERE m.Trabajo_Practico_FechaEvaluacion IS NOT NULL
           AND m.Inscripcion_Numero IS NOT NULL
 
-        PRINT 'Trabajos pr�cticos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
+        PRINT 'Trabajos practicos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
     END TRY
     BEGIN CATCH
@@ -1134,18 +1134,18 @@ END
 GO
 
 /*******************************************************************************
- * SP 14: MIGRACI�N DE EXAMEN FINAL
+ * SP 14: MIGRACION DE EXAMEN FINAL
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_examen_final
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_examen_final
 AS
 BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
-        PRINT 'Migrando ex�menes finales...'
+        PRINT 'Migrando examenes finales...'
 
-        INSERT INTO NOMBRE_GRUPO.examen_final (
+        INSERT INTO FOR_Y_UN_IF.examen_final (
             examen_final_fecha,
             examen_final_hora,
             examen_final_descripcion,
@@ -1160,7 +1160,7 @@ BEGIN
         WHERE m.Examen_Final_Fecha IS NOT NULL
           AND m.Curso_Codigo IS NOT NULL
 
-        PRINT 'Ex�menes finales migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
+        PRINT 'Examenes finales migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
     END TRY
     BEGIN CATCH
@@ -1171,10 +1171,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 15: MIGRACI�N DE INSCRIPCI�N FINAL
+ * SP 15: MIGRACION DE INSCRIPCION FINAL
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_inscripcion_final
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_inscripcion_final
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1182,7 +1182,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando inscripciones a finales...'
 
-        INSERT INTO NOMBRE_GRUPO.inscripcion_final (
+        INSERT INTO FOR_Y_UN_IF.inscripcion_final (
             inscripcion_final_nro,
             inscripcion_final_fecha,
             alumno_legajo,
@@ -1194,7 +1194,7 @@ BEGIN
             m.Alumno_Legajo,
             ef.examen_final_id
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.examen_final ef
+        JOIN FOR_Y_UN_IF.examen_final ef
             ON m.Examen_Final_Fecha = ef.examen_final_fecha
             AND m.Curso_Codigo = ef.curso_codigo
             AND ISNULL(m.Examen_Final_Hora, '') = ISNULL(ef.examen_final_hora, '')
@@ -1212,10 +1212,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 16: MIGRACI�N DE EVALUACI�N FINAL
+ * SP 16: MIGRACION DE EVALUACION FINAL
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_evaluacion_final
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_evaluacion_final
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1223,7 +1223,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando evaluaciones de finales...'
 
-        INSERT INTO NOMBRE_GRUPO.evaluacion_final (
+        INSERT INTO FOR_Y_UN_IF.evaluacion_final (
             evaluacion_final_nota,
             evaluacion_final_presente,
             inscripcion_final_nro,
@@ -1251,10 +1251,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 17: MIGRACI�N DE FACTURA
+ * SP 17: MIGRACION DE FACTURA
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_factura
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_factura
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1262,7 +1262,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando facturas...'
 
-        INSERT INTO NOMBRE_GRUPO.factura (
+        INSERT INTO FOR_Y_UN_IF.factura (
             factura_numero,
             factura_fecha_emision,
             factura_fecha_vencimiento,
@@ -1290,10 +1290,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 18: MIGRACI�N DE DETALLE FACTURA
+ * SP 18: MIGRACION DE DETALLE FACTURA
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_detalle_factura
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_detalle_factura
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1301,7 +1301,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando detalles de factura...'
 
-        INSERT INTO NOMBRE_GRUPO.detalle_factura (
+        INSERT INTO FOR_Y_UN_IF.detalle_factura (
             detalle_importe,
             factura_numero,
             curso_codigo,
@@ -1313,7 +1313,7 @@ BEGIN
             m.Curso_Codigo,
             p.periodo_id
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.periodo p
+        JOIN FOR_Y_UN_IF.periodo p
             ON m.Periodo_Anio = p.periodo_anio
             AND m.Periodo_Mes = p.periodo_mes
         WHERE m.Factura_Numero IS NOT NULL
@@ -1332,10 +1332,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 19: MIGRACI�N DE PAGO
+ * SP 19: MIGRACION DE PAGO
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_pago
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_pago
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1343,7 +1343,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando pagos...'
 
-        INSERT INTO NOMBRE_GRUPO.pago (
+        INSERT INTO FOR_Y_UN_IF.pago (
             pago_fecha,
             pago_importe,
             factura_numero,
@@ -1355,7 +1355,7 @@ BEGIN
             m.Factura_Numero,
             mp.medio_pago_id
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.medio_pago mp
+        JOIN FOR_Y_UN_IF.medio_pago mp
             ON m.Pago_MedioPago = mp.medio_pago_nombre
         WHERE m.Pago_Fecha IS NOT NULL
           AND m.Factura_Numero IS NOT NULL
@@ -1371,10 +1371,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 20: MIGRACI�N DE ENCUESTA
+ * SP 20: MIGRACION DE ENCUESTA
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_encuesta
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_encuesta
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1382,7 +1382,7 @@ BEGIN
     BEGIN TRY
         PRINT 'Migrando encuestas...'
 
-        -- Crear tabla temporal para identificar encuestas �nicas
+        -- Crear tabla temporal para identificar encuestas Unicas
         CREATE TABLE #EncuestasTemporal (
             encuesta_temp_id INT IDENTITY(1,1),
             curso_codigo BIGINT,
@@ -1399,7 +1399,7 @@ BEGIN
         WHERE Encuesta_FechaRegistro IS NOT NULL
           AND Curso_Codigo IS NOT NULL
 
-        INSERT INTO NOMBRE_GRUPO.encuesta (
+        INSERT INTO FOR_Y_UN_IF.encuesta (
             encuesta_fecha_registro,
             encuesta_observacion,
             curso_codigo
@@ -1425,10 +1425,10 @@ END
 GO
 
 /*******************************************************************************
- * SP 21: MIGRACI�N DE RESPUESTA ENCUESTA
+ * SP 21: MIGRACION DE RESPUESTA ENCUESTA
  ******************************************************************************/
 
-CREATE PROCEDURE NOMBRE_GRUPO.migrar_respuesta_encuesta
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_respuesta_encuesta
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1437,17 +1437,17 @@ BEGIN
         PRINT 'Migrando respuestas de encuestas...'
 
         -- Migrar respuestas de pregunta 1
-        INSERT INTO NOMBRE_GRUPO.respuesta_encuesta (respuesta_nota, encuesta_id, pregunta_id)
+        INSERT INTO FOR_Y_UN_IF.respuesta_encuesta (respuesta_nota, encuesta_id, pregunta_id)
         SELECT
             m.Encuesta_Nota1,
             e.encuesta_id,
             p.pregunta_id
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.encuesta e
+        JOIN FOR_Y_UN_IF.encuesta e
             ON m.Curso_Codigo = e.curso_codigo
             AND m.Encuesta_FechaRegistro = e.encuesta_fecha_registro
             AND ISNULL(m.Encuesta_Observacion, '') = ISNULL(e.encuesta_observacion, '')
-        JOIN NOMBRE_GRUPO.pregunta_encuesta p
+        JOIN FOR_Y_UN_IF.pregunta_encuesta p
             ON m.Encuesta_Pregunta1 = p.pregunta_texto
         WHERE m.Encuesta_Pregunta1 IS NOT NULL
           AND m.Encuesta_Nota1 IS NOT NULL
@@ -1455,17 +1455,17 @@ BEGIN
         PRINT 'Respuestas pregunta 1 migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
         -- Migrar respuestas de pregunta 2
-        INSERT INTO NOMBRE_GRUPO.respuesta_encuesta (respuesta_nota, encuesta_id, pregunta_id)
+        INSERT INTO FOR_Y_UN_IF.respuesta_encuesta (respuesta_nota, encuesta_id, pregunta_id)
         SELECT
             m.Encuesta_Nota2,
             e.encuesta_id,
             p.pregunta_id
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.encuesta e
+        JOIN FOR_Y_UN_IF.encuesta e
             ON m.Curso_Codigo = e.curso_codigo
             AND m.Encuesta_FechaRegistro = e.encuesta_fecha_registro
             AND ISNULL(m.Encuesta_Observacion, '') = ISNULL(e.encuesta_observacion, '')
-        JOIN NOMBRE_GRUPO.pregunta_encuesta p
+        JOIN FOR_Y_UN_IF.pregunta_encuesta p
             ON m.Encuesta_Pregunta2 = p.pregunta_texto
         WHERE m.Encuesta_Pregunta2 IS NOT NULL
           AND m.Encuesta_Nota2 IS NOT NULL
@@ -1473,17 +1473,17 @@ BEGIN
         PRINT 'Respuestas pregunta 2 migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
         -- Migrar respuestas de pregunta 3
-        INSERT INTO NOMBRE_GRUPO.respuesta_encuesta (respuesta_nota, encuesta_id, pregunta_id)
+        INSERT INTO FOR_Y_UN_IF.respuesta_encuesta (respuesta_nota, encuesta_id, pregunta_id)
         SELECT
             m.Encuesta_Nota3,
             e.encuesta_id,
             p.pregunta_id
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.encuesta e
+        JOIN FOR_Y_UN_IF.encuesta e
             ON m.Curso_Codigo = e.curso_codigo
             AND m.Encuesta_FechaRegistro = e.encuesta_fecha_registro
             AND ISNULL(m.Encuesta_Observacion, '') = ISNULL(e.encuesta_observacion, '')
-        JOIN NOMBRE_GRUPO.pregunta_encuesta p
+        JOIN FOR_Y_UN_IF.pregunta_encuesta p
             ON m.Encuesta_Pregunta3 = p.pregunta_texto
         WHERE m.Encuesta_Pregunta3 IS NOT NULL
           AND m.Encuesta_Nota3 IS NOT NULL
@@ -1491,17 +1491,17 @@ BEGIN
         PRINT 'Respuestas pregunta 3 migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
         -- Migrar respuestas de pregunta 4
-        INSERT INTO NOMBRE_GRUPO.respuesta_encuesta (respuesta_nota, encuesta_id, pregunta_id)
+        INSERT INTO FOR_Y_UN_IF.respuesta_encuesta (respuesta_nota, encuesta_id, pregunta_id)
         SELECT
             m.Encuesta_Nota4,
             e.encuesta_id,
             p.pregunta_id
         FROM gd_esquema.Maestra m
-        JOIN NOMBRE_GRUPO.encuesta e
+        JOIN FOR_Y_UN_IF.encuesta e
             ON m.Curso_Codigo = e.curso_codigo
             AND m.Encuesta_FechaRegistro = e.encuesta_fecha_registro
             AND ISNULL(m.Encuesta_Observacion, '') = ISNULL(e.encuesta_observacion, '')
-        JOIN NOMBRE_GRUPO.pregunta_encuesta p
+        JOIN FOR_Y_UN_IF.pregunta_encuesta p
             ON m.Encuesta_Pregunta4 = p.pregunta_texto
         WHERE m.Encuesta_Pregunta4 IS NOT NULL
           AND m.Encuesta_Nota4 IS NOT NULL
@@ -1518,147 +1518,147 @@ END
 GO
 
 /*******************************************************************************
- * PARTE 10: EJECUCI�N DE LA MIGRACI�N EN ORDEN
+ * PARTE 10: EJECUCION DE LA MIGRACION EN ORDEN
  ******************************************************************************/
 
 PRINT '========================================='
-PRINT 'EJECUTANDO MIGRACI�N COMPLETA'
+PRINT 'EJECUTANDO MIGRACION COMPLETA'
 PRINT '========================================='
 GO
 
--- Paso 1: Cat�logos independientes
+-- Paso 1: Catalogos independientes
 PRINT ''
-PRINT '--- PASO 1: CAT�LOGOS ---'
-EXEC NOMBRE_GRUPO.migrar_catalogos
+PRINT '--- PASO 1: CATALOGOS ---'
+EXEC FOR_Y_UN_IF.migrar_catalogos
 GO
 
 -- Paso 2: Provincias
 PRINT ''
 PRINT '--- PASO 2: PROVINCIAS ---'
-EXEC NOMBRE_GRUPO.migrar_provincia
+EXEC FOR_Y_UN_IF.migrar_provincia
 GO
 
 -- Paso 3: Localidades
 PRINT ''
 PRINT '--- PASO 3: LOCALIDADES ---'
-EXEC NOMBRE_GRUPO.migrar_localidad
+EXEC FOR_Y_UN_IF.migrar_localidad
 GO
 
 -- Paso 4: Instituciones
 PRINT ''
 PRINT '--- PASO 4: INSTITUCIONES ---'
-EXEC NOMBRE_GRUPO.migrar_institucion
+EXEC FOR_Y_UN_IF.migrar_institucion
 GO
 
 -- Paso 5: Sedes
 PRINT ''
 PRINT '--- PASO 5: SEDES ---'
-EXEC NOMBRE_GRUPO.migrar_sede
+EXEC FOR_Y_UN_IF.migrar_sede
 GO
 
 -- Paso 6: Profesores
 PRINT ''
 PRINT '--- PASO 6: PROFESORES ---'
-EXEC NOMBRE_GRUPO.migrar_profesor
+EXEC FOR_Y_UN_IF.migrar_profesor
 GO
 
 -- Paso 7: Alumnos
 PRINT ''
 PRINT '--- PASO 7: ALUMNOS ---'
-EXEC NOMBRE_GRUPO.migrar_alumno
+EXEC FOR_Y_UN_IF.migrar_alumno
 GO
 
 -- Paso 8: Cursos
 PRINT ''
 PRINT '--- PASO 8: CURSOS ---'
-EXEC NOMBRE_GRUPO.migrar_curso
+EXEC FOR_Y_UN_IF.migrar_curso
 GO
 
--- Paso 9: Curso-D�a
+-- Paso 9: Curso-Dia
 PRINT ''
-PRINT '--- PASO 9: CURSO-D�A ---'
-EXEC NOMBRE_GRUPO.migrar_curso_dia
+PRINT '--- PASO 9: CURSO-DIA ---'
+EXEC FOR_Y_UN_IF.migrar_curso_dia
 GO
 
--- Paso 10: M�dulos
+-- Paso 10: Modulos
 PRINT ''
-PRINT '--- PASO 10: M�DULOS ---'
-EXEC NOMBRE_GRUPO.migrar_modulo
+PRINT '--- PASO 10: MODULOS ---'
+EXEC FOR_Y_UN_IF.migrar_modulo
 GO
 
 -- Paso 11: Inscripciones
 PRINT ''
 PRINT '--- PASO 11: INSCRIPCIONES ---'
-EXEC NOMBRE_GRUPO.migrar_inscripcion
+EXEC FOR_Y_UN_IF.migrar_inscripcion
 GO
 
 -- Paso 12: Evaluaciones de Curso
 PRINT ''
 PRINT '--- PASO 12: EVALUACIONES DE CURSO ---'
-EXEC NOMBRE_GRUPO.migrar_evaluacion_curso
+EXEC FOR_Y_UN_IF.migrar_evaluacion_curso
 GO
 
--- Paso 13: Trabajos Pr�cticos
+-- Paso 13: Trabajos Practicos
 PRINT ''
-PRINT '--- PASO 13: TRABAJOS PR�CTICOS ---'
-EXEC NOMBRE_GRUPO.migrar_trabajo_practico
+PRINT '--- PASO 13: TRABAJOS PRACTICOS ---'
+EXEC FOR_Y_UN_IF.migrar_trabajo_practico
 GO
 
--- Paso 14: Ex�menes Finales
+-- Paso 14: Examenes Finales
 PRINT ''
-PRINT '--- PASO 14: EX�MENES FINALES ---'
-EXEC NOMBRE_GRUPO.migrar_examen_final
+PRINT '--- PASO 14: EXAMENES FINALES ---'
+EXEC FOR_Y_UN_IF.migrar_examen_final
 GO
 
 -- Paso 15: Inscripciones a Finales
 PRINT ''
 PRINT '--- PASO 15: INSCRIPCIONES A FINALES ---'
-EXEC NOMBRE_GRUPO.migrar_inscripcion_final
+EXEC FOR_Y_UN_IF.migrar_inscripcion_final
 GO
 
 -- Paso 16: Evaluaciones de Finales
 PRINT ''
 PRINT '--- PASO 16: EVALUACIONES DE FINALES ---'
-EXEC NOMBRE_GRUPO.migrar_evaluacion_final
+EXEC FOR_Y_UN_IF.migrar_evaluacion_final
 GO
 
 -- Paso 17: Facturas
 PRINT ''
 PRINT '--- PASO 17: FACTURAS ---'
-EXEC NOMBRE_GRUPO.migrar_factura
+EXEC FOR_Y_UN_IF.migrar_factura
 GO
 
 -- Paso 18: Detalles de Factura
 PRINT ''
 PRINT '--- PASO 18: DETALLES DE FACTURA ---'
-EXEC NOMBRE_GRUPO.migrar_detalle_factura
+EXEC FOR_Y_UN_IF.migrar_detalle_factura
 GO
 
 -- Paso 19: Pagos
 PRINT ''
 PRINT '--- PASO 19: PAGOS ---'
-EXEC NOMBRE_GRUPO.migrar_pago
+EXEC FOR_Y_UN_IF.migrar_pago
 GO
 
 -- Paso 20: Encuestas
 PRINT ''
 PRINT '--- PASO 20: ENCUESTAS ---'
-EXEC NOMBRE_GRUPO.migrar_encuesta
+EXEC FOR_Y_UN_IF.migrar_encuesta
 GO
 
 -- Paso 21: Respuestas de Encuestas
 PRINT ''
 PRINT '--- PASO 21: RESPUESTAS DE ENCUESTAS ---'
-EXEC NOMBRE_GRUPO.migrar_respuesta_encuesta
+EXEC FOR_Y_UN_IF.migrar_respuesta_encuesta
 GO
 
 /*******************************************************************************
- * PARTE 11: VALIDACI�N DE LA MIGRACI�N
+ * PARTE 11: VALIDACION DE LA MIGRACION
  ******************************************************************************/
 
 PRINT ''
 PRINT '========================================='
-PRINT 'VALIDACI�N DE LA MIGRACI�N'
+PRINT 'VALIDACION DE LA MIGRACION'
 PRINT '========================================='
 GO
 
@@ -1668,91 +1668,91 @@ PRINT ''
 
 DECLARE @count INT
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.provincia
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.provincia
 PRINT 'Provincias: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.localidad
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.localidad
 PRINT 'Localidades: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.institucion
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.institucion
 PRINT 'Instituciones: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.sede
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.sede
 PRINT 'Sedes: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.categoria
-PRINT 'Categor�as: ' + CAST(@count AS VARCHAR)
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.categoria
+PRINT 'Categorias: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.turno
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.turno
 PRINT 'Turnos: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.dia
-PRINT 'D�as: ' + CAST(@count AS VARCHAR)
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.dia
+PRINT 'Dias: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.medio_pago
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.medio_pago
 PRINT 'Medios de pago: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.periodo
-PRINT 'Per�odos: ' + CAST(@count AS VARCHAR)
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.periodo
+PRINT 'Periodos: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.pregunta_encuesta
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.pregunta_encuesta
 PRINT 'Preguntas encuesta: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.profesor
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.profesor
 PRINT 'Profesores: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.alumno
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.alumno
 PRINT 'Alumnos: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.curso
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.curso
 PRINT 'Cursos: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.curso_dia
-PRINT 'Curso-D�a: ' + CAST(@count AS VARCHAR)
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.curso_dia
+PRINT 'Curso-Dia: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.modulo
-PRINT 'M�dulos: ' + CAST(@count AS VARCHAR)
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.modulo
+PRINT 'Modulos: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.inscripcion
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.inscripcion
 PRINT 'Inscripciones: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.evaluacion_curso
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.evaluacion_curso
 PRINT 'Evaluaciones curso: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.trabajo_practico
-PRINT 'Trabajos pr�cticos: ' + CAST(@count AS VARCHAR)
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.trabajo_practico
+PRINT 'Trabajos practicos: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.examen_final
-PRINT 'Ex�menes finales: ' + CAST(@count AS VARCHAR)
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.examen_final
+PRINT 'Examenes finales: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.inscripcion_final
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.inscripcion_final
 PRINT 'Inscripciones finales: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.evaluacion_final
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.evaluacion_final
 PRINT 'Evaluaciones finales: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.factura
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.factura
 PRINT 'Facturas: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.detalle_factura
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.detalle_factura
 PRINT 'Detalles factura: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.pago
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.pago
 PRINT 'Pagos: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.encuesta
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.encuesta
 PRINT 'Encuestas: ' + CAST(@count AS VARCHAR)
 
-SELECT @count = COUNT(*) FROM NOMBRE_GRUPO.respuesta_encuesta
+SELECT @count = COUNT(*) FROM FOR_Y_UN_IF.respuesta_encuesta
 PRINT 'Respuestas encuesta: ' + CAST(@count AS VARCHAR)
 
 PRINT ''
 PRINT '========================================='
-PRINT 'MIGRACI�N COMPLETADA EXITOSAMENTE'
+PRINT 'MIGRACION COMPLETADA EXITOSAMENTE'
 PRINT 'Fecha/Hora: ' + CONVERT(VARCHAR, GETDATE(), 120)
 PRINT '========================================='
 GO
 
 /*******************************************************************************
- * FIN DEL SCRIPT DE MIGRACI�N
+ * FIN DEL SCRIPT DE MIGRACION
  ******************************************************************************/
