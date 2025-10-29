@@ -157,13 +157,13 @@ CREATE TABLE FOR_Y_UN_IF.hecho_inscripciones (
     cantidad_inscripciones INT NOT NULL DEFAULT 0,
     cantidad_rechazadas INT NOT NULL DEFAULT 0,
     cantidad_aceptadas INT NOT NULL DEFAULT 0,
-    CONSTRAINT FK_hecho_inscripciones_tiempo FOREIGN KEY (tiempo_id) 
+    CONSTRAINT FK_hecho_inscripciones_tiempo FOREIGN KEY (tiempo_id)
         REFERENCES FOR_Y_UN_IF.dim_tiempo(tiempo_id),
-    CONSTRAINT FK_hecho_inscripciones_sede FOREIGN KEY (sede_id) 
+    CONSTRAINT FK_hecho_inscripciones_sede FOREIGN KEY (sede_id)
         REFERENCES FOR_Y_UN_IF.dim_sede(sede_id),
-    CONSTRAINT FK_hecho_inscripciones_turno FOREIGN KEY (turno_id) 
+    CONSTRAINT FK_hecho_inscripciones_turno FOREIGN KEY (turno_id)
         REFERENCES FOR_Y_UN_IF.dim_turno(turno_id),
-    CONSTRAINT FK_hecho_inscripciones_categoria FOREIGN KEY (categoria_id) 
+    CONSTRAINT FK_hecho_inscripciones_categoria FOREIGN KEY (categoria_id)
         REFERENCES FOR_Y_UN_IF.dim_categoria(categoria_id)
 )
 PRINT 'Tabla hecho_inscripciones creada'
@@ -177,11 +177,11 @@ CREATE TABLE FOR_Y_UN_IF.hecho_cursada (
     categoria_id INT NOT NULL,
     cantidad_alumnos INT NOT NULL DEFAULT 0,
     cantidad_aprobados INT NOT NULL DEFAULT 0,
-    CONSTRAINT FK_hecho_cursada_tiempo FOREIGN KEY (tiempo_id) 
+    CONSTRAINT FK_hecho_cursada_tiempo FOREIGN KEY (tiempo_id)
         REFERENCES FOR_Y_UN_IF.dim_tiempo(tiempo_id),
-    CONSTRAINT FK_hecho_cursada_sede FOREIGN KEY (sede_id) 
+    CONSTRAINT FK_hecho_cursada_sede FOREIGN KEY (sede_id)
         REFERENCES FOR_Y_UN_IF.dim_sede(sede_id),
-    CONSTRAINT FK_hecho_cursada_categoria FOREIGN KEY (categoria_id) 
+    CONSTRAINT FK_hecho_cursada_categoria FOREIGN KEY (categoria_id)
         REFERENCES FOR_Y_UN_IF.dim_categoria(categoria_id)
 )
 PRINT 'Tabla hecho_cursada creada'
@@ -199,13 +199,13 @@ CREATE TABLE FOR_Y_UN_IF.hecho_finales (
     cantidad_ausentes INT NOT NULL DEFAULT 0,
     suma_notas DECIMAL(18,2) NOT NULL DEFAULT 0,
     suma_dias_finalizacion INT NOT NULL DEFAULT 0,
-    CONSTRAINT FK_hecho_finales_tiempo FOREIGN KEY (tiempo_id) 
+    CONSTRAINT FK_hecho_finales_tiempo FOREIGN KEY (tiempo_id)
         REFERENCES FOR_Y_UN_IF.dim_tiempo(tiempo_id),
-    CONSTRAINT FK_hecho_finales_sede FOREIGN KEY (sede_id) 
+    CONSTRAINT FK_hecho_finales_sede FOREIGN KEY (sede_id)
         REFERENCES FOR_Y_UN_IF.dim_sede(sede_id),
-    CONSTRAINT FK_hecho_finales_categoria FOREIGN KEY (categoria_id) 
+    CONSTRAINT FK_hecho_finales_categoria FOREIGN KEY (categoria_id)
         REFERENCES FOR_Y_UN_IF.dim_categoria(categoria_id),
-    CONSTRAINT FK_hecho_finales_rango_etario_alumno FOREIGN KEY (rango_etario_alumno_id) 
+    CONSTRAINT FK_hecho_finales_rango_etario_alumno FOREIGN KEY (rango_etario_alumno_id)
         REFERENCES FOR_Y_UN_IF.dim_rango_etario_alumno(rango_etario_alumno_id)
 )
 PRINT 'Tabla hecho_finales creada'
@@ -220,11 +220,11 @@ CREATE TABLE FOR_Y_UN_IF.hecho_pagos (
     cantidad_pagos INT NOT NULL DEFAULT 0,
     cantidad_pagos_fuera_termino INT NOT NULL DEFAULT 0,
     importe_total DECIMAL(18,2) NOT NULL DEFAULT 0,
-    CONSTRAINT FK_hecho_pagos_tiempo FOREIGN KEY (tiempo_id) 
+    CONSTRAINT FK_hecho_pagos_tiempo FOREIGN KEY (tiempo_id)
         REFERENCES FOR_Y_UN_IF.dim_tiempo(tiempo_id),
-    CONSTRAINT FK_hecho_pagos_sede FOREIGN KEY (sede_id) 
+    CONSTRAINT FK_hecho_pagos_sede FOREIGN KEY (sede_id)
         REFERENCES FOR_Y_UN_IF.dim_sede(sede_id),
-    CONSTRAINT FK_hecho_pagos_medio_pago FOREIGN KEY (medio_pago_id) 
+    CONSTRAINT FK_hecho_pagos_medio_pago FOREIGN KEY (medio_pago_id)
         REFERENCES FOR_Y_UN_IF.dim_medio_pago(medio_pago_id)
 )
 PRINT 'Tabla hecho_pagos creada'
@@ -240,11 +240,11 @@ CREATE TABLE FOR_Y_UN_IF.hecho_facturacion (
     importe_pagado DECIMAL(18,2) NOT NULL DEFAULT 0,
     importe_adeudado DECIMAL(18,2) NOT NULL DEFAULT 0,
     cantidad_facturas INT NOT NULL DEFAULT 0,
-    CONSTRAINT FK_hecho_facturacion_tiempo FOREIGN KEY (tiempo_id) 
+    CONSTRAINT FK_hecho_facturacion_tiempo FOREIGN KEY (tiempo_id)
         REFERENCES FOR_Y_UN_IF.dim_tiempo(tiempo_id),
-    CONSTRAINT FK_hecho_facturacion_sede FOREIGN KEY (sede_id) 
+    CONSTRAINT FK_hecho_facturacion_sede FOREIGN KEY (sede_id)
         REFERENCES FOR_Y_UN_IF.dim_sede(sede_id),
-    CONSTRAINT FK_hecho_facturacion_categoria FOREIGN KEY (categoria_id) 
+    CONSTRAINT FK_hecho_facturacion_categoria FOREIGN KEY (categoria_id)
         REFERENCES FOR_Y_UN_IF.dim_categoria(categoria_id)
 )
 PRINT 'Tabla hecho_facturacion creada'
@@ -258,13 +258,13 @@ CREATE TABLE FOR_Y_UN_IF.hecho_satisfaccion (
     rango_etario_profesor_id INT NOT NULL,
     bloque_satisfaccion_id INT NOT NULL,
     cantidad_respuestas INT NOT NULL DEFAULT 0,
-    CONSTRAINT FK_hecho_satisfaccion_tiempo FOREIGN KEY (tiempo_id) 
+    CONSTRAINT FK_hecho_satisfaccion_tiempo FOREIGN KEY (tiempo_id)
         REFERENCES FOR_Y_UN_IF.dim_tiempo(tiempo_id),
-    CONSTRAINT FK_hecho_satisfaccion_sede FOREIGN KEY (sede_id) 
+    CONSTRAINT FK_hecho_satisfaccion_sede FOREIGN KEY (sede_id)
         REFERENCES FOR_Y_UN_IF.dim_sede(sede_id),
-    CONSTRAINT FK_hecho_satisfaccion_rango_profesor FOREIGN KEY (rango_etario_profesor_id) 
+    CONSTRAINT FK_hecho_satisfaccion_rango_profesor FOREIGN KEY (rango_etario_profesor_id)
         REFERENCES FOR_Y_UN_IF.dim_rango_etario_profesor(rango_etario_profesor_id),
-    CONSTRAINT FK_hecho_satisfaccion_bloque FOREIGN KEY (bloque_satisfaccion_id) 
+    CONSTRAINT FK_hecho_satisfaccion_bloque FOREIGN KEY (bloque_satisfaccion_id)
         REFERENCES FOR_Y_UN_IF.dim_satisfaccion(satisfaccion_id)
 )
 PRINT 'Tabla hecho_satisfaccion creada'
@@ -293,12 +293,12 @@ BEGIN
         @FechaActual,
         YEAR(@FechaActual),
         MONTH(@FechaActual),
-        CASE 
+        CASE
             WHEN MONTH(@FechaActual) BETWEEN 1 AND 4 THEN 1
             WHEN MONTH(@FechaActual) BETWEEN 5 AND 8 THEN 2
             ELSE 3
         END,
-        CASE 
+        CASE
             WHEN MONTH(@FechaActual) BETWEEN 1 AND 6 THEN 1
             ELSE 2
         END,
@@ -393,7 +393,7 @@ GO
 PRINT 'Cargando dimension satisfaccion...'
 
 INSERT INTO FOR_Y_UN_IF.dim_satisfaccion (bloque_descripcion, rango_min, rango_max)
-VALUES 
+VALUES
     ('Satisfechos', 7, 10),
     ('Neutrales', 5, 6),
     ('Insatisfechos', 1, 4)
@@ -416,14 +416,14 @@ RETURNS INT
 AS
 BEGIN
     DECLARE @rango_id INT
-    
+
     SELECT @rango_id = rango_etario_alumno_id
     FROM FOR_Y_UN_IF.dim_rango_etario_alumno
     WHERE (@edad < 25 AND rango_descripcion = '< 25')
        OR (@edad BETWEEN 25 AND 35 AND rango_descripcion = '25 - 35')
        OR (@edad BETWEEN 36 AND 50 AND rango_descripcion = '35 - 50')
        OR (@edad > 50 AND rango_descripcion = '> 50')
-    
+
     RETURN @rango_id
 END
 GO
@@ -436,13 +436,13 @@ RETURNS INT
 AS
 BEGIN
     DECLARE @rango_id INT
-    
+
     SELECT @rango_id = rango_etario_profesor_id
     FROM FOR_Y_UN_IF.dim_rango_etario_profesor
     WHERE (@edad BETWEEN 25 AND 35 AND rango_descripcion = '25 - 35')
        OR (@edad BETWEEN 36 AND 50 AND rango_descripcion = '35 - 50')
        OR (@edad > 50 AND rango_descripcion = '> 50')
-    
+
     RETURN @rango_id
 END
 GO
@@ -455,11 +455,11 @@ RETURNS INT
 AS
 BEGIN
     DECLARE @bloque_id INT
-    
+
     SELECT @bloque_id = satisfaccion_id
     FROM FOR_Y_UN_IF.dim_satisfaccion
     WHERE @nota BETWEEN rango_min AND rango_max
-    
+
     RETURN @bloque_id
 END
 GO
@@ -487,7 +487,7 @@ INSERT INTO FOR_Y_UN_IF.hecho_inscripciones (
     cantidad_rechazadas,
     cantidad_aceptadas
 )
-SELECT 
+SELECT
     t.tiempo_id,
     c.sede_id,
     c.turno_id,
@@ -513,14 +513,14 @@ INSERT INTO FOR_Y_UN_IF.hecho_cursada (
     cantidad_alumnos,
     cantidad_aprobados
 )
-SELECT 
+SELECT
     t.tiempo_id,
     c.sede_id,
     c.categoria_id,
     COUNT(DISTINCT i.alumno_legajo) AS cantidad_alumnos,
-    SUM(CASE 
-        WHEN aprobado.alumno_legajo IS NOT NULL THEN 1 
-        ELSE 0 
+    SUM(CASE
+        WHEN aprobado.alumno_legajo IS NOT NULL THEN 1
+        ELSE 0
     END) AS cantidad_aprobados
 FROM FOR_Y_UN_IF.inscripcion i
 JOIN FOR_Y_UN_IF.curso c ON i.curso_codigo = c.curso_codigo
@@ -541,7 +541,7 @@ LEFT JOIN (
         FROM FOR_Y_UN_IF.trabajo_practico tp
         WHERE tp.trabajo_practico_nota < 4
     )
-) aprobado ON i.alumno_legajo = aprobado.alumno_legajo 
+) aprobado ON i.alumno_legajo = aprobado.alumno_legajo
            AND i.curso_codigo = aprobado.curso_codigo
 WHERE i.inscripcion_estado = 'Aceptada'
 GROUP BY t.tiempo_id, c.sede_id, c.categoria_id
@@ -563,7 +563,7 @@ INSERT INTO FOR_Y_UN_IF.hecho_finales (
     suma_notas,
     suma_dias_finalizacion
 )
-SELECT 
+SELECT
     t.tiempo_id,
     c.sede_id,
     c.categoria_id,
@@ -574,10 +574,10 @@ SELECT
     SUM(CASE WHEN evf.evaluacion_final_presente = 1 THEN 1 ELSE 0 END) AS cantidad_presentes,
     SUM(CASE WHEN evf.evaluacion_final_presente = 0 THEN 1 ELSE 0 END) AS cantidad_ausentes,
     SUM(CASE WHEN evf.evaluacion_final_presente = 1 THEN evf.evaluacion_final_nota ELSE 0 END) AS suma_notas,
-    SUM(CASE 
-        WHEN evf.evaluacion_final_presente = 1 AND evf.evaluacion_final_nota >= 4 
+    SUM(CASE
+        WHEN evf.evaluacion_final_presente = 1 AND evf.evaluacion_final_nota >= 4
         THEN DATEDIFF(DAY, c.curso_fecha_inicio, ef.examen_final_fecha)
-        ELSE 0 
+        ELSE 0
     END) AS suma_dias_finalizacion
 FROM FOR_Y_UN_IF.inscripcion_final inf
 JOIN FOR_Y_UN_IF.alumno a ON inf.alumno_legajo = a.alumno_legajo
@@ -585,7 +585,7 @@ JOIN FOR_Y_UN_IF.examen_final ef ON inf.examen_final_id = ef.examen_final_id
 JOIN FOR_Y_UN_IF.curso c ON ef.curso_codigo = c.curso_codigo
 JOIN FOR_Y_UN_IF.dim_tiempo t ON CAST(ef.examen_final_fecha AS DATE) = t.fecha
 LEFT JOIN FOR_Y_UN_IF.evaluacion_final evf ON inf.inscripcion_final_nro = evf.inscripcion_final_nro
-GROUP BY 
+GROUP BY
     t.tiempo_id,
     c.sede_id,
     c.categoria_id,
@@ -607,14 +607,14 @@ INSERT INTO FOR_Y_UN_IF.hecho_pagos (
     cantidad_pagos_fuera_termino,
     importe_total
 )
-SELECT 
+SELECT
     t.tiempo_id,
     c.sede_id,
     p.medio_pago_id,
     COUNT(*) AS cantidad_pagos,
-    SUM(CASE 
-        WHEN p.pago_fecha > f.factura_fecha_vencimiento THEN 1 
-        ELSE 0 
+    SUM(CASE
+        WHEN p.pago_fecha > f.factura_fecha_vencimiento THEN 1
+        ELSE 0
     END) AS cantidad_pagos_fuera_termino,
     SUM(p.pago_importe) AS importe_total
 FROM FOR_Y_UN_IF.pago p
@@ -639,7 +639,7 @@ INSERT INTO FOR_Y_UN_IF.hecho_facturacion (
     importe_adeudado,
     cantidad_facturas
 )
-SELECT 
+SELECT
     t.tiempo_id,
     c.sede_id,
     c.categoria_id,
@@ -671,7 +671,7 @@ INSERT INTO FOR_Y_UN_IF.hecho_satisfaccion (
     bloque_satisfaccion_id,
     cantidad_respuestas
 )
-SELECT 
+SELECT
     t.tiempo_id,
     c.sede_id,
     FOR_Y_UN_IF.fn_obtener_rango_etario_profesor(
@@ -684,7 +684,7 @@ JOIN FOR_Y_UN_IF.respuesta_encuesta re ON e.encuesta_id = re.encuesta_id
 JOIN FOR_Y_UN_IF.curso c ON e.curso_codigo = c.curso_codigo
 JOIN FOR_Y_UN_IF.profesor p ON c.profesor_dni = p.profesor_dni
 JOIN FOR_Y_UN_IF.dim_tiempo t ON CAST(e.encuesta_fecha_registro AS DATE) = t.fecha
-GROUP BY 
+GROUP BY
     t.tiempo_id,
     c.sede_id,
     FOR_Y_UN_IF.fn_obtener_rango_etario_profesor(
@@ -707,7 +707,7 @@ GO
 -- VISTA 1: Categorías y turnos más solicitados
 CREATE VIEW FOR_Y_UN_IF.vw_categorias_turnos_solicitados
 AS
-SELECT 
+SELECT
     t.anio,
     s.sede_nombre,
     c.categoria_nombre,
@@ -726,17 +726,17 @@ GO
 -- VISTA 2: Tasa de rechazo de inscripciones
 CREATE VIEW FOR_Y_UN_IF.vw_tasa_rechazo_inscripciones
 AS
-SELECT 
+SELECT
     t.anio,
     t.mes,
     t.nombre_mes,
     s.sede_nombre,
     SUM(hi.cantidad_inscripciones) AS total_inscripciones,
     SUM(hi.cantidad_rechazadas) AS total_rechazadas,
-    CASE 
-        WHEN SUM(hi.cantidad_inscripciones) > 0 
+    CASE
+        WHEN SUM(hi.cantidad_inscripciones) > 0
         THEN CAST(SUM(hi.cantidad_rechazadas) * 100.0 / SUM(hi.cantidad_inscripciones) AS DECIMAL(10,2))
-        ELSE 0 
+        ELSE 0
     END AS porcentaje_rechazo
 FROM FOR_Y_UN_IF.hecho_inscripciones hi
 JOIN FOR_Y_UN_IF.dim_tiempo t ON hi.tiempo_id = t.tiempo_id
@@ -749,15 +749,15 @@ GO
 -- VISTA 3: Comparación de desempeño de cursada por sede
 CREATE VIEW FOR_Y_UN_IF.vw_desempeno_cursada
 AS
-SELECT 
+SELECT
     t.anio,
     s.sede_nombre,
     SUM(hc.cantidad_alumnos) AS total_alumnos,
     SUM(hc.cantidad_aprobados) AS total_aprobados,
-    CASE 
-        WHEN SUM(hc.cantidad_alumnos) > 0 
+    CASE
+        WHEN SUM(hc.cantidad_alumnos) > 0
         THEN CAST(SUM(hc.cantidad_aprobados) * 100.0 / SUM(hc.cantidad_alumnos) AS DECIMAL(10,2))
-        ELSE 0 
+        ELSE 0
     END AS porcentaje_aprobacion
 FROM FOR_Y_UN_IF.hecho_cursada hc
 JOIN FOR_Y_UN_IF.dim_tiempo t ON hc.tiempo_id = t.tiempo_id
@@ -770,14 +770,14 @@ GO
 -- VISTA 4: Tiempo promedio de finalización de curso
 CREATE VIEW FOR_Y_UN_IF.vw_tiempo_finalizacion_curso
 AS
-SELECT 
+SELECT
     t.anio,
     c.categoria_nombre,
     SUM(hf.cantidad_presentes) AS total_finalizaron,
-    CASE 
-        WHEN SUM(hf.cantidad_presentes) > 0 
+    CASE
+        WHEN SUM(hf.cantidad_presentes) > 0
         THEN CAST(SUM(hf.suma_dias_finalizacion) * 1.0 / SUM(hf.cantidad_presentes) AS DECIMAL(10,2))
-        ELSE 0 
+        ELSE 0
     END AS promedio_dias_finalizacion
 FROM FOR_Y_UN_IF.hecho_finales hf
 JOIN FOR_Y_UN_IF.dim_tiempo t ON hf.tiempo_id = t.tiempo_id
@@ -791,16 +791,16 @@ GO
 -- VISTA 5: Nota promedio de finales
 CREATE VIEW FOR_Y_UN_IF.vw_nota_promedio_finales
 AS
-SELECT 
+SELECT
     t.anio,
     t.semestre,
     c.categoria_nombre,
     r.rango_descripcion AS rango_etario,
     SUM(hf.cantidad_presentes) AS total_presentes,
-    CASE 
-        WHEN SUM(hf.cantidad_presentes) > 0 
+    CASE
+        WHEN SUM(hf.cantidad_presentes) > 0
         THEN CAST(SUM(hf.suma_notas) * 1.0 / SUM(hf.cantidad_presentes) AS DECIMAL(10,2))
-        ELSE 0 
+        ELSE 0
     END AS nota_promedio
 FROM FOR_Y_UN_IF.hecho_finales hf
 JOIN FOR_Y_UN_IF.dim_tiempo t ON hf.tiempo_id = t.tiempo_id
@@ -815,16 +815,16 @@ GO
 -- VISTA 6: Tasa de ausentismo en finales
 CREATE VIEW FOR_Y_UN_IF.vw_ausentismo_finales
 AS
-SELECT 
+SELECT
     t.anio,
     t.semestre,
     s.sede_nombre,
     SUM(hf.cantidad_inscriptos) AS total_inscriptos,
     SUM(hf.cantidad_ausentes) AS total_ausentes,
-    CASE 
-        WHEN SUM(hf.cantidad_inscriptos) > 0 
+    CASE
+        WHEN SUM(hf.cantidad_inscriptos) > 0
         THEN CAST(SUM(hf.cantidad_ausentes) * 100.0 / SUM(hf.cantidad_inscriptos) AS DECIMAL(10,2))
-        ELSE 0 
+        ELSE 0
     END AS porcentaje_ausentismo
 FROM FOR_Y_UN_IF.hecho_finales hf
 JOIN FOR_Y_UN_IF.dim_tiempo t ON hf.tiempo_id = t.tiempo_id
@@ -837,16 +837,16 @@ GO
 -- VISTA 7: Desvío de pagos
 CREATE VIEW FOR_Y_UN_IF.vw_desvio_pagos
 AS
-SELECT 
+SELECT
     t.anio,
     t.semestre,
     s.sede_nombre,
     SUM(hp.cantidad_pagos) AS total_pagos,
     SUM(hp.cantidad_pagos_fuera_termino) AS pagos_fuera_termino,
-    CASE 
-        WHEN SUM(hp.cantidad_pagos) > 0 
+    CASE
+        WHEN SUM(hp.cantidad_pagos) > 0
         THEN CAST(SUM(hp.cantidad_pagos_fuera_termino) * 100.0 / SUM(hp.cantidad_pagos) AS DECIMAL(10,2))
-        ELSE 0 
+        ELSE 0
     END AS porcentaje_fuera_termino
 FROM FOR_Y_UN_IF.hecho_pagos hp
 JOIN FOR_Y_UN_IF.dim_tiempo t ON hp.tiempo_id = t.tiempo_id
@@ -859,17 +859,17 @@ GO
 -- VISTA 8: Tasa de morosidad financiera mensual
 CREATE VIEW FOR_Y_UN_IF.vw_morosidad_financiera
 AS
-SELECT 
+SELECT
     t.anio,
     t.mes,
     t.nombre_mes,
     s.sede_nombre,
     SUM(hf.importe_facturado) AS importe_esperado,
     SUM(hf.importe_adeudado) AS importe_adeudado,
-    CASE 
-        WHEN SUM(hf.importe_facturado) > 0 
+    CASE
+        WHEN SUM(hf.importe_facturado) > 0
         THEN CAST(SUM(hf.importe_adeudado) * 100.0 / SUM(hf.importe_facturado) AS DECIMAL(10,2))
-        ELSE 0 
+        ELSE 0
     END AS tasa_morosidad
 FROM FOR_Y_UN_IF.hecho_facturacion hf
 JOIN FOR_Y_UN_IF.dim_tiempo t ON hf.tiempo_id = t.tiempo_id
@@ -883,7 +883,7 @@ GO
 CREATE VIEW FOR_Y_UN_IF.vw_ingresos_categoria
 AS
 WITH RankedIngresos AS (
-    SELECT 
+    SELECT
         t.anio,
         s.sede_nombre,
         c.categoria_nombre,
@@ -895,7 +895,7 @@ WITH RankedIngresos AS (
     JOIN FOR_Y_UN_IF.dim_categoria c ON hf.categoria_id = c.categoria_id
     GROUP BY t.anio, s.sede_nombre, c.categoria_nombre
 )
-SELECT 
+SELECT
     anio,
     sede_nombre,
     categoria_nombre,
@@ -910,7 +910,7 @@ GO
 -- VISTA 10: Índice de satisfacción
 CREATE VIEW FOR_Y_UN_IF.vw_indice_satisfaccion
 AS
-SELECT 
+SELECT
     t.anio,
     s.sede_nombre,
     r.rango_descripcion AS rango_etario_profesor,
@@ -918,13 +918,13 @@ SELECT
     SUM(CASE WHEN ds.bloque_descripcion = 'Neutrales' THEN hs.cantidad_respuestas ELSE 0 END) AS cant_neutrales,
     SUM(CASE WHEN ds.bloque_descripcion = 'Insatisfechos' THEN hs.cantidad_respuestas ELSE 0 END) AS cant_insatisfechos,
     SUM(hs.cantidad_respuestas) AS total_respuestas,
-    CASE 
+    CASE
         WHEN SUM(hs.cantidad_respuestas) > 0 THEN
             CAST((
                 (SUM(CASE WHEN ds.bloque_descripcion = 'Satisfechos' THEN hs.cantidad_respuestas ELSE 0 END) * 100.0 / SUM(hs.cantidad_respuestas)) -
                 (SUM(CASE WHEN ds.bloque_descripcion = 'Insatisfechos' THEN hs.cantidad_respuestas ELSE 0 END) * 100.0 / SUM(hs.cantidad_respuestas)) + 100
             ) / 2 AS DECIMAL(10,2))
-        ELSE 0 
+        ELSE 0
     END AS indice_satisfaccion
 FROM FOR_Y_UN_IF.hecho_satisfaccion hs
 JOIN FOR_Y_UN_IF.dim_tiempo t ON hs.tiempo_id = t.tiempo_id

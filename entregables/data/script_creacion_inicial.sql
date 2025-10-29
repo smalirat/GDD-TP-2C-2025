@@ -97,170 +97,15 @@ PRINT 'Esquema FOR_Y_UN_IF creado correctamente'
 GO
 
 /*******************************************************************************
- * PARTE 2: CREACION DE TABLAS - ENTIDADES PRINCIPALES
+ * PARTE 2: CREACIÓN DE TABLAS - ENTIDADES SECUNDARIAS (CATÁLOGOS)
  ******************************************************************************/
 
 PRINT '========================================='
-PRINT 'CREANDO TABLAS PRINCIPALES'
+PRINT 'CREANDO TABLAS SECUNDARIAS (CATÁLOGOS)'
 PRINT '========================================='
 GO
 
--- Tabla: SEDE
-CREATE TABLE FOR_Y_UN_IF.sede (
-    sede_id INT IDENTITY(1,1) PRIMARY KEY,
-    sede_nombre NVARCHAR(255) NOT NULL,
-    sede_direccion NVARCHAR(255) NULL,
-    sede_telefono NVARCHAR(255) NULL,
-    sede_mail NVARCHAR(255) NULL,
-    localidad_id INT NOT NULL,
-    institucion_cuit NVARCHAR(255) NOT NULL,
-    CONSTRAINT FK_sede_localidad FOREIGN KEY (localidad_id)
-        REFERENCES FOR_Y_UN_IF.localidad(localidad_id),
-    CONSTRAINT FK_sede_institucion FOREIGN KEY (institucion_cuit)
-        REFERENCES FOR_Y_UN_IF.institucion(institucion_cuit)
-)
-PRINT 'Tabla sede creada'
-GO
-
--- Tabla: PROFESOR
-CREATE TABLE FOR_Y_UN_IF.profesor (
-    profesor_dni NVARCHAR(255) PRIMARY KEY,
-    profesor_nombre NVARCHAR(255) NOT NULL,
-    profesor_apellido NVARCHAR(255) NOT NULL,
-    profesor_fecha_nacimiento DATETIME2(6) NULL,
-    profesor_mail NVARCHAR(255) NULL,
-    profesor_direccion NVARCHAR(255) NULL,
-    profesor_telefono NVARCHAR(255) NULL,
-    localidad_id INT NULL,
-    CONSTRAINT FK_profesor_localidad FOREIGN KEY (localidad_id)
-        REFERENCES FOR_Y_UN_IF.localidad(localidad_id)
-)
-PRINT 'Tabla profesor creada'
-GO
-
--- Tabla: ALUMNO
-CREATE TABLE FOR_Y_UN_IF.alumno (
-    alumno_legajo BIGINT PRIMARY KEY,
-    alumno_dni BIGINT NULL,
-    alumno_nombre VARCHAR(255) NOT NULL,
-    alumno_apellido VARCHAR(255) NOT NULL,
-    alumno_fecha_nacimiento DATETIME2(6) NULL,
-    alumno_mail VARCHAR(255) NULL,
-    alumno_direccion VARCHAR(255) NULL,
-    alumno_telefono VARCHAR(255) NULL,
-    localidad_id INT NULL,
-    CONSTRAINT FK_alumno_localidad FOREIGN KEY (localidad_id)
-        REFERENCES FOR_Y_UN_IF.localidad(localidad_id)
-)
-PRINT 'Tabla alumno creada'
-GO
-
--- Tabla: CURSO
-CREATE TABLE FOR_Y_UN_IF.curso (
-    curso_codigo BIGINT PRIMARY KEY,
-    curso_nombre VARCHAR(255) NOT NULL,
-    curso_descripcion VARCHAR(255) NULL,
-    curso_fecha_inicio DATETIME2(6) NULL,
-    curso_fecha_fin DATETIME2(6) NULL,
-    curso_duracion_meses BIGINT NULL,
-    curso_precio_mensual DECIMAL(38, 2) NULL,
-    sede_id INT NOT NULL,
-    categoria_id INT NOT NULL,
-    turno_id INT NOT NULL,
-    profesor_dni NVARCHAR(255) NOT NULL,
-    CONSTRAINT FK_curso_sede FOREIGN KEY (sede_id)
-        REFERENCES FOR_Y_UN_IF.sede(sede_id),
-    CONSTRAINT FK_curso_categoria FOREIGN KEY (categoria_id)
-        REFERENCES FOR_Y_UN_IF.categoria(categoria_id),
-    CONSTRAINT FK_curso_turno FOREIGN KEY (turno_id)
-        REFERENCES FOR_Y_UN_IF.turno(turno_id),
-    CONSTRAINT FK_curso_profesor FOREIGN KEY (profesor_dni)
-        REFERENCES FOR_Y_UN_IF.profesor(profesor_dni)
-)
-PRINT 'Tabla curso creada'
-GO
-
--- Tabla: CURSO_DIA (relacion N:M)
-CREATE TABLE FOR_Y_UN_IF.curso_dia (
-    curso_dia_id INT IDENTITY(1,1) PRIMARY KEY,
-    curso_codigo BIGINT NOT NULL,
-    dia_id INT NOT NULL,
-    CONSTRAINT FK_curso_dia_curso FOREIGN KEY (curso_codigo)
-        REFERENCES FOR_Y_UN_IF.curso(curso_codigo),
-    CONSTRAINT FK_curso_dia_dia FOREIGN KEY (dia_id)
-        REFERENCES FOR_Y_UN_IF.dia(dia_id),
-    CONSTRAINT UQ_curso_dia UNIQUE (curso_codigo, dia_id)
-)
-PRINT 'Tabla curso_dia creada'
-GO
-
--- Tabla: MODULO
-CREATE TABLE FOR_Y_UN_IF.modulo (
-    modulo_id INT IDENTITY(1,1) PRIMARY KEY,
-    modulo_nombre VARCHAR(255) NOT NULL,
-    modulo_descripcion VARCHAR(255) NULL,
-    curso_codigo BIGINT NOT NULL,
-    CONSTRAINT FK_modulo_curso FOREIGN KEY (curso_codigo)
-        REFERENCES FOR_Y_UN_IF.curso(curso_codigo)
-)
-PRINT 'Tabla modulo creada'
-GO
-
-/*******************************************************************************
- * PARTE 3: CREACION DE TABLAS - INSCRIPCIONES Y EVALUACIONES
- ******************************************************************************/
-
-PRINT '========================================='
-PRINT 'CREANDO TABLAS DE INSCRIPCIONES'
-PRINT '========================================='
-GO
-
--- Tabla: INSCRIPCION
-CREATE TABLE FOR_Y_UN_IF.inscripcion (
-    inscripcion_numero BIGINT PRIMARY KEY,
-    inscripcion_fecha DATETIME2(6) NOT NULL,
-    inscripcion_estado VARCHAR(255) NULL,
-    inscripcion_fecha_respuesta DATETIME2(6) NULL,
-    alumno_legajo BIGINT NOT NULL,
-    curso_codigo BIGINT NOT NULL,
-    CONSTRAINT FK_inscripcion_alumno FOREIGN KEY (alumno_legajo)
-        REFERENCES FOR_Y_UN_IF.alumno(alumno_legajo),
-    CONSTRAINT FK_inscripcion_curso FOREIGN KEY (curso_codigo)
-        REFERENCES FOR_Y_UN_IF.curso(curso_codigo)
-)
-PRINT 'Tabla inscripcion creada'
-GO
-
--- Tabla: EVALUACION_CURSO
-CREATE TABLE FOR_Y_UN_IF.evaluacion_curso (
-    evaluacion_id INT IDENTITY(1,1) PRIMARY KEY,
-    evaluacion_nota BIGINT NULL,
-    evaluacion_fecha DATETIME2(6) NULL,
-    evaluacion_instancia BIGINT NULL,
-    evaluacion_presente BIT NULL,
-    inscripcion_numero BIGINT NOT NULL,
-    modulo_id INT NOT NULL,
-    CONSTRAINT FK_evaluacion_curso_inscripcion FOREIGN KEY (inscripcion_numero)
-        REFERENCES FOR_Y_UN_IF.inscripcion(inscripcion_numero),
-    CONSTRAINT FK_evaluacion_curso_modulo FOREIGN KEY (modulo_id)
-        REFERENCES FOR_Y_UN_IF.modulo(modulo_id)
-)
-PRINT 'Tabla evaluacion_curso creada'
-GO
-
--- Tabla: TRABAJO_PRACTICO
-CREATE TABLE FOR_Y_UN_IF.trabajo_practico (
-    trabajo_practico_id INT IDENTITY(1,1) PRIMARY KEY,
-    trabajo_practico_nota BIGINT NULL,
-    trabajo_practico_fecha_evaluacion DATETIME2(6) NULL,
-    inscripcion_numero BIGINT NOT NULL,
-    CONSTRAINT FK_trabajo_practico_inscripcion FOREIGN KEY (inscripcion_numero)
-        REFERENCES FOR_Y_UN_IF.inscripcion(inscripcion_numero)
-)
-PRINT 'Tabla trabajo_practico creada'
-GO
-
--- Tabla: PROVINCIA
+-- Tabla: PROVINCIA (Debe crearse primero)
 CREATE TABLE FOR_Y_UN_IF.provincia (
     provincia_id INT IDENTITY(1,1) PRIMARY KEY,
     provincia_nombre NVARCHAR(255) NOT NULL
@@ -268,7 +113,7 @@ CREATE TABLE FOR_Y_UN_IF.provincia (
 PRINT 'Tabla provincia creada'
 GO
 
--- Tabla: LOCALIDAD
+-- Tabla: LOCALIDAD (Depende de PROVINCIA)
 CREATE TABLE FOR_Y_UN_IF.localidad (
     localidad_id INT IDENTITY(1,1) PRIMARY KEY,
     localidad_nombre NVARCHAR(255) NOT NULL,
@@ -312,112 +157,6 @@ CREATE TABLE FOR_Y_UN_IF.dia (
 PRINT 'Tabla dia creada'
 GO
 
-
-/*******************************************************************************
- * PARTE 4: CREACION DE TABLAS - FINALES
- ******************************************************************************/
-
-PRINT '========================================='
-PRINT 'CREANDO TABLAS DE FINALES'
-PRINT '========================================='
-GO
-
--- Tabla: EXAMEN_FINAL
-CREATE TABLE FOR_Y_UN_IF.examen_final (
-    examen_final_id INT IDENTITY(1,1) PRIMARY KEY,
-    examen_final_fecha DATETIME2(6) NOT NULL,
-    examen_final_hora VARCHAR(255) NULL,
-    examen_final_descripcion VARCHAR(255) NULL,
-    curso_codigo BIGINT NOT NULL,
-    CONSTRAINT FK_examen_final_curso FOREIGN KEY (curso_codigo)
-        REFERENCES FOR_Y_UN_IF.curso(curso_codigo)
-)
-PRINT 'Tabla examen_final creada'
-GO
-
--- Tabla: INSCRIPCION_FINAL
-CREATE TABLE FOR_Y_UN_IF.inscripcion_final (
-    inscripcion_final_nro BIGINT PRIMARY KEY,
-    inscripcion_final_fecha DATETIME2(6) NOT NULL,
-    alumno_legajo BIGINT NOT NULL,
-    examen_final_id INT NOT NULL,
-    CONSTRAINT FK_inscripcion_final_alumno FOREIGN KEY (alumno_legajo)
-        REFERENCES FOR_Y_UN_IF.alumno(alumno_legajo),
-    CONSTRAINT FK_inscripcion_final_examen FOREIGN KEY (examen_final_id)
-        REFERENCES FOR_Y_UN_IF.examen_final(examen_final_id)
-)
-PRINT 'Tabla inscripcion_final creada'
-GO
-
--- Tabla: EVALUACION_FINAL
-CREATE TABLE FOR_Y_UN_IF.evaluacion_final (
-    evaluacion_final_id INT IDENTITY(1,1) PRIMARY KEY,
-    evaluacion_final_nota BIGINT NULL,
-    evaluacion_final_presente BIT NULL,
-    inscripcion_final_nro BIGINT NOT NULL,
-    profesor_dni NVARCHAR(255) NOT NULL,
-    CONSTRAINT FK_evaluacion_final_inscripcion FOREIGN KEY (inscripcion_final_nro)
-        REFERENCES FOR_Y_UN_IF.inscripcion_final(inscripcion_final_nro),
-    CONSTRAINT FK_evaluacion_final_profesor FOREIGN KEY (profesor_dni)
-        REFERENCES FOR_Y_UN_IF.profesor(profesor_dni)
-)
-PRINT 'Tabla evaluacion_final creada'
-GO
-
-/*******************************************************************************
- * PARTE 5: CREACION DE TABLAS - PAGOS Y FACTURACION
- ******************************************************************************/
-
-PRINT '========================================='
-PRINT 'CREANDO TABLAS DE PAGOS'
-PRINT '========================================='
-GO
-
--- Tabla: FACTURA
-CREATE TABLE FOR_Y_UN_IF.factura (
-    factura_numero BIGINT PRIMARY KEY,
-    factura_fecha_emision DATETIME2(6) NOT NULL,
-    factura_fecha_vencimiento DATETIME2(6) NULL,
-    factura_total DECIMAL(18, 2) NULL,
-    alumno_legajo BIGINT NOT NULL,
-    CONSTRAINT FK_factura_alumno FOREIGN KEY (alumno_legajo)
-        REFERENCES FOR_Y_UN_IF.alumno(alumno_legajo)
-)
-PRINT 'Tabla factura creada'
-GO
-
--- Tabla: DETALLE_FACTURA
-CREATE TABLE FOR_Y_UN_IF.detalle_factura (
-    detalle_id INT IDENTITY(1,1) PRIMARY KEY,
-    detalle_importe DECIMAL(18, 2) NULL,
-    factura_numero BIGINT NOT NULL,
-    curso_codigo BIGINT NOT NULL,
-    periodo_id INT NOT NULL,
-    CONSTRAINT FK_detalle_factura_factura FOREIGN KEY (factura_numero)
-        REFERENCES FOR_Y_UN_IF.factura(factura_numero),
-    CONSTRAINT FK_detalle_factura_curso FOREIGN KEY (curso_codigo)
-        REFERENCES FOR_Y_UN_IF.curso(curso_codigo),
-    CONSTRAINT FK_detalle_factura_periodo FOREIGN KEY (periodo_id)
-        REFERENCES FOR_Y_UN_IF.periodo(periodo_id)
-)
-PRINT 'Tabla detalle_factura creada'
-GO
-
--- Tabla: PAGO
-CREATE TABLE FOR_Y_UN_IF.pago (
-    pago_id INT IDENTITY(1,1) PRIMARY KEY,
-    pago_fecha DATETIME2(6) NOT NULL,
-    pago_importe DECIMAL(18, 2) NULL,
-    factura_numero BIGINT NOT NULL,
-    medio_pago_id INT NOT NULL,
-    CONSTRAINT FK_pago_factura FOREIGN KEY (factura_numero)
-        REFERENCES FOR_Y_UN_IF.factura(factura_numero),
-    CONSTRAINT FK_pago_medio_pago FOREIGN KEY (medio_pago_id)
-        REFERENCES FOR_Y_UN_IF.medio_pago(medio_pago_id)
-)
-PRINT 'Tabla pago creada'
-GO
-
 -- Tabla: MEDIO_PAGO
 CREATE TABLE FOR_Y_UN_IF.medio_pago (
     medio_pago_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -437,9 +176,289 @@ CREATE TABLE FOR_Y_UN_IF.periodo (
 PRINT 'Tabla periodo creada'
 GO
 
+-- Tabla: PREGUNTA_ENCUESTA
+CREATE TABLE FOR_Y_UN_IF.pregunta_encuesta (
+    pregunta_id INT IDENTITY(1,1) PRIMARY KEY,
+    pregunta_texto VARCHAR(255) NOT NULL UNIQUE
+)
+PRINT 'Tabla pregunta_encuesta creada'
+GO
+
 
 /*******************************************************************************
- * PARTE 6: CREACION DE TABLAS - ENCUESTAS
+ * PARTE 3: CREACIÓN DE TABLAS - ENTIDADES PRINCIPALES
+ ******************************************************************************/
+
+PRINT '========================================='
+PRINT 'CREANDO TABLAS PRINCIPALES'
+PRINT '========================================='
+GO
+
+-- Tabla: SEDE (Depende de LOCALIDAD, INSTITUCION)
+CREATE TABLE FOR_Y_UN_IF.sede (
+    sede_id INT IDENTITY(1,1) PRIMARY KEY,
+    sede_nombre NVARCHAR(255) NOT NULL,
+    sede_direccion NVARCHAR(255) NULL,
+    sede_telefono NVARCHAR(255) NULL,
+    sede_mail NVARCHAR(255) NULL,
+    localidad_id INT NOT NULL,
+    institucion_cuit NVARCHAR(255) NOT NULL,
+    CONSTRAINT FK_sede_localidad FOREIGN KEY (localidad_id)
+        REFERENCES FOR_Y_UN_IF.localidad(localidad_id),
+    CONSTRAINT FK_sede_institucion FOREIGN KEY (institucion_cuit)
+        REFERENCES FOR_Y_UN_IF.institucion(institucion_cuit)
+)
+PRINT 'Tabla sede creada'
+GO
+
+-- Tabla: PROFESOR (Depende de LOCALIDAD)
+CREATE TABLE FOR_Y_UN_IF.profesor (
+    profesor_dni NVARCHAR(255) PRIMARY KEY,
+    profesor_nombre NVARCHAR(255) NOT NULL,
+    profesor_apellido NVARCHAR(255) NOT NULL,
+    profesor_fecha_nacimiento DATETIME2(6) NULL,
+    profesor_mail NVARCHAR(255) NULL,
+    profesor_direccion NVARCHAR(255) NULL,
+    profesor_telefono NVARCHAR(255) NULL,
+    localidad_id INT NULL,
+    CONSTRAINT FK_profesor_localidad FOREIGN KEY (localidad_id)
+        REFERENCES FOR_Y_UN_IF.localidad(localidad_id)
+)
+PRINT 'Tabla profesor creada'
+GO
+
+-- Tabla: ALUMNO (Depende de LOCALIDAD)
+CREATE TABLE FOR_Y_UN_IF.alumno (
+    alumno_legajo BIGINT PRIMARY KEY,
+    alumno_dni BIGINT NULL,
+    alumno_nombre VARCHAR(255) NOT NULL,
+    alumno_apellido VARCHAR(255) NOT NULL,
+    alumno_fecha_nacimiento DATETIME2(6) NULL,
+    alumno_mail VARCHAR(255) NULL,
+    alumno_direccion VARCHAR(255) NULL,
+    alumno_telefono VARCHAR(255) NULL,
+    localidad_id INT NULL,
+    CONSTRAINT FK_alumno_localidad FOREIGN KEY (localidad_id)
+        REFERENCES FOR_Y_UN_IF.localidad(localidad_id)
+)
+PRINT 'Tabla alumno creada'
+GO
+
+-- Tabla: CURSO (Depende de SEDE, CATEGORIA, TURNO, PROFESOR)
+CREATE TABLE FOR_Y_UN_IF.curso (
+    curso_codigo BIGINT PRIMARY KEY,
+    curso_nombre VARCHAR(255) NOT NULL,
+    curso_descripcion VARCHAR(255) NULL,
+    curso_fecha_inicio DATETIME2(6) NULL,
+    curso_fecha_fin DATETIME2(6) NULL,
+    curso_duracion_meses BIGINT NULL,
+    curso_precio_mensual DECIMAL(38, 2) NULL,
+    sede_id INT NOT NULL,
+    categoria_id INT NOT NULL,
+    turno_id INT NOT NULL,
+    profesor_dni NVARCHAR(255) NOT NULL,
+    CONSTRAINT FK_curso_sede FOREIGN KEY (sede_id)
+        REFERENCES FOR_Y_UN_IF.sede(sede_id),
+    CONSTRAINT FK_curso_categoria FOREIGN KEY (categoria_id)
+        REFERENCES FOR_Y_UN_IF.categoria(categoria_id),
+    CONSTRAINT FK_curso_turno FOREIGN KEY (turno_id)
+        REFERENCES FOR_Y_UN_IF.turno(turno_id),
+    CONSTRAINT FK_curso_profesor FOREIGN KEY (profesor_dni)
+        REFERENCES FOR_Y_UN_IF.profesor(profesor_dni)
+)
+PRINT 'Tabla curso creada'
+GO
+
+-- Tabla: MODULO (Depende de CURSO)
+CREATE TABLE FOR_Y_UN_IF.modulo (
+    modulo_id INT IDENTITY(1,1) PRIMARY KEY,
+    modulo_nombre VARCHAR(255) NOT NULL,
+    modulo_descripcion VARCHAR(255) NULL,
+    curso_codigo BIGINT NOT NULL,
+    CONSTRAINT FK_modulo_curso FOREIGN KEY (curso_codigo)
+        REFERENCES FOR_Y_UN_IF.curso(curso_codigo)
+)
+PRINT 'Tabla modulo creada'
+GO
+
+-- Tabla: CURSO_DIA (relación N:M, Depende de CURSO, DIA)
+CREATE TABLE FOR_Y_UN_IF.curso_dia (
+    curso_dia_id INT IDENTITY(1,1) PRIMARY KEY,
+    curso_codigo BIGINT NOT NULL,
+    dia_id INT NOT NULL,
+    CONSTRAINT FK_curso_dia_curso FOREIGN KEY (curso_codigo)
+        REFERENCES FOR_Y_UN_IF.curso(curso_codigo),
+    CONSTRAINT FK_curso_dia_dia FOREIGN KEY (dia_id)
+        REFERENCES FOR_Y_UN_IF.dia(dia_id),
+    CONSTRAINT UQ_curso_dia UNIQUE (curso_codigo, dia_id)
+)
+PRINT 'Tabla curso_dia creada'
+GO
+
+
+/*******************************************************************************
+ * PARTE 4: CREACIÓN DE TABLAS - INSCRIPCIONES Y EVALUACIONES
+ ******************************************************************************/
+
+PRINT '========================================='
+PRINT 'CREANDO TABLAS DE INSCRIPCIONES'
+PRINT '========================================='
+GO
+
+-- Tabla: INSCRIPCION (Depende de ALUMNO, CURSO)
+CREATE TABLE FOR_Y_UN_IF.inscripcion (
+    inscripcion_numero BIGINT PRIMARY KEY,
+    inscripcion_fecha DATETIME2(6) NOT NULL,
+    inscripcion_estado VARCHAR(255) NULL,
+    inscripcion_fecha_respuesta DATETIME2(6) NULL,
+    alumno_legajo BIGINT NOT NULL,
+    curso_codigo BIGINT NOT NULL,
+    CONSTRAINT FK_inscripcion_alumno FOREIGN KEY (alumno_legajo)
+        REFERENCES FOR_Y_UN_IF.alumno(alumno_legajo),
+    CONSTRAINT FK_inscripcion_curso FOREIGN KEY (curso_codigo)
+        REFERENCES FOR_Y_UN_IF.curso(curso_codigo)
+)
+PRINT 'Tabla inscripcion creada'
+GO
+
+-- Tabla: EVALUACION_CURSO (Depende de INSCRIPCION, MODULO)
+CREATE TABLE FOR_Y_UN_IF.evaluacion_curso (
+    evaluacion_id INT IDENTITY(1,1) PRIMARY KEY,
+    evaluacion_nota BIGINT NULL,
+    evaluacion_fecha DATETIME2(6) NULL,
+    evaluacion_instancia BIGINT NULL,
+    evaluacion_presente BIT NULL,
+    inscripcion_numero BIGINT NOT NULL,
+    modulo_id INT NOT NULL,
+    CONSTRAINT FK_evaluacion_curso_inscripcion FOREIGN KEY (inscripcion_numero)
+        REFERENCES FOR_Y_UN_IF.inscripcion(inscripcion_numero),
+    CONSTRAINT FK_evaluacion_curso_modulo FOREIGN KEY (modulo_id)
+        REFERENCES FOR_Y_UN_IF.modulo(modulo_id)
+)
+PRINT 'Tabla evaluacion_curso creada'
+GO
+
+-- Tabla: TRABAJO_PRACTICO (Depende de INSCRIPCION)
+CREATE TABLE FOR_Y_UN_IF.trabajo_practico (
+    trabajo_practico_id INT IDENTITY(1,1) PRIMARY KEY,
+    trabajo_practico_nota BIGINT NULL,
+    trabajo_practico_fecha_evaluacion DATETIME2(6) NULL,
+    inscripcion_numero BIGINT NOT NULL,
+    CONSTRAINT FK_trabajo_practico_inscripcion FOREIGN KEY (inscripcion_numero)
+        REFERENCES FOR_Y_UN_IF.inscripcion(inscripcion_numero)
+)
+PRINT 'Tabla trabajo_practico creada'
+GO
+
+
+/*******************************************************************************
+ * PARTE 5: CREACIÓN DE TABLAS - FINALES
+ ******************************************************************************/
+
+PRINT '========================================='
+PRINT 'CREANDO TABLAS DE FINALES'
+PRINT '========================================='
+GO
+
+-- Tabla: EXAMEN_FINAL (Depende de CURSO)
+CREATE TABLE FOR_Y_UN_IF.examen_final (
+    examen_final_id INT IDENTITY(1,1) PRIMARY KEY,
+    examen_final_fecha DATETIME2(6) NOT NULL,
+    examen_final_hora VARCHAR(255) NULL,
+    examen_final_descripcion VARCHAR(255) NULL,
+    curso_codigo BIGINT NOT NULL,
+    CONSTRAINT FK_examen_final_curso FOREIGN KEY (curso_codigo)
+        REFERENCES FOR_Y_UN_IF.curso(curso_codigo)
+)
+PRINT 'Tabla examen_final creada'
+GO
+
+-- Tabla: INSCRIPCION_FINAL (Depende de ALUMNO, EXAMEN_FINAL)
+CREATE TABLE FOR_Y_UN_IF.inscripcion_final (
+    inscripcion_final_nro BIGINT PRIMARY KEY,
+    inscripcion_final_fecha DATETIME2(6) NOT NULL,
+    alumno_legajo BIGINT NOT NULL,
+    examen_final_id INT NOT NULL,
+    CONSTRAINT FK_inscripcion_final_alumno FOREIGN KEY (alumno_legajo)
+        REFERENCES FOR_Y_UN_IF.alumno(alumno_legajo),
+    CONSTRAINT FK_inscripcion_final_examen FOREIGN KEY (examen_final_id)
+        REFERENCES FOR_Y_UN_IF.examen_final(examen_final_id)
+)
+PRINT 'Tabla inscripcion_final creada'
+GO
+
+-- Tabla: EVALUACION_FINAL (Depende de INSCRIPCION_FINAL, PROFESOR)
+CREATE TABLE FOR_Y_UN_IF.evaluacion_final (
+    evaluacion_final_id INT IDENTITY(1,1) PRIMARY KEY,
+    evaluacion_final_nota BIGINT NULL,
+    evaluacion_final_presente BIT NULL,
+    inscripcion_final_nro BIGINT NOT NULL,
+    profesor_dni NVARCHAR(255) NOT NULL,
+    CONSTRAINT FK_evaluacion_final_inscripcion FOREIGN KEY (inscripcion_final_nro)
+        REFERENCES FOR_Y_UN_IF.inscripcion_final(inscripcion_final_nro),
+    CONSTRAINT FK_evaluacion_final_profesor FOREIGN KEY (profesor_dni)
+        REFERENCES FOR_Y_UN_IF.profesor(profesor_dni)
+)
+PRINT 'Tabla evaluacion_final creada'
+GO
+
+/*******************************************************************************
+ * PARTE 6: CREACIÓN DE TABLAS - PAGOS Y FACTURACIÓN
+ ******************************************************************************/
+
+PRINT '========================================='
+PRINT 'CREANDO TABLAS DE PAGOS'
+PRINT '========================================='
+GO
+
+-- Tabla: FACTURA (Depende de ALUMNO)
+CREATE TABLE FOR_Y_UN_IF.factura (
+    factura_numero BIGINT PRIMARY KEY,
+    factura_fecha_emision DATETIME2(6) NOT NULL,
+    factura_fecha_vencimiento DATETIME2(6) NULL,
+    factura_total DECIMAL(18, 2) NULL,
+    alumno_legajo BIGINT NOT NULL,
+    CONSTRAINT FK_factura_alumno FOREIGN KEY (alumno_legajo)
+        REFERENCES FOR_Y_UN_IF.alumno(alumno_legajo)
+)
+PRINT 'Tabla factura creada'
+GO
+
+-- Tabla: DETALLE_FACTURA (Depende de FACTURA, CURSO, PERIODO)
+CREATE TABLE FOR_Y_UN_IF.detalle_factura (
+    detalle_id INT IDENTITY(1,1) PRIMARY KEY,
+    detalle_importe DECIMAL(18, 2) NULL,
+    factura_numero BIGINT NOT NULL,
+    curso_codigo BIGINT NOT NULL,
+    periodo_id INT NOT NULL,
+    CONSTRAINT FK_detalle_factura_factura FOREIGN KEY (factura_numero)
+        REFERENCES FOR_Y_UN_IF.factura(factura_numero),
+    CONSTRAINT FK_detalle_factura_curso FOREIGN KEY (curso_codigo)
+        REFERENCES FOR_Y_UN_IF.curso(curso_codigo),
+    CONSTRAINT FK_detalle_factura_periodo FOREIGN KEY (periodo_id)
+        REFERENCES FOR_Y_UN_IF.periodo(periodo_id)
+)
+PRINT 'Tabla detalle_factura creada'
+GO
+
+-- Tabla: PAGO (Depende de FACTURA, MEDIO_PAGO)
+CREATE TABLE FOR_Y_UN_IF.pago (
+    pago_id INT IDENTITY(1,1) PRIMARY KEY,
+    pago_fecha DATETIME2(6) NOT NULL,
+    pago_importe DECIMAL(18, 2) NULL,
+    factura_numero BIGINT NOT NULL,
+    medio_pago_id INT NOT NULL,
+    CONSTRAINT FK_pago_factura FOREIGN KEY (factura_numero)
+        REFERENCES FOR_Y_UN_IF.factura(factura_numero),
+    CONSTRAINT FK_pago_medio_pago FOREIGN KEY (medio_pago_id)
+        REFERENCES FOR_Y_UN_IF.medio_pago(medio_pago_id)
+)
+PRINT 'Tabla pago creada'
+GO
+
+
+/*******************************************************************************
+ * PARTE 7: CREACIÓN DE TABLAS - ENCUESTAS
  ******************************************************************************/
 
 PRINT '========================================='
@@ -447,7 +466,7 @@ PRINT 'CREANDO TABLAS DE ENCUESTAS'
 PRINT '========================================='
 GO
 
--- Tabla: ENCUESTA
+-- Tabla: ENCUESTA (Depende de CURSO)
 CREATE TABLE FOR_Y_UN_IF.encuesta (
     encuesta_id INT IDENTITY(1,1) PRIMARY KEY,
     encuesta_fecha_registro DATETIME2(6) NOT NULL,
@@ -459,7 +478,7 @@ CREATE TABLE FOR_Y_UN_IF.encuesta (
 PRINT 'Tabla encuesta creada'
 GO
 
--- Tabla: RESPUESTA_ENCUESTA
+-- Tabla: RESPUESTA_ENCUESTA (Depende de ENCUESTA, PREGUNTA_ENCUESTA)
 CREATE TABLE FOR_Y_UN_IF.respuesta_encuesta (
     respuesta_id INT IDENTITY(1,1) PRIMARY KEY,
     respuesta_nota BIGINT NOT NULL,
@@ -473,24 +492,16 @@ CREATE TABLE FOR_Y_UN_IF.respuesta_encuesta (
 PRINT 'Tabla respuesta_encuesta creada'
 GO
 
--- Tabla: PREGUNTA_ENCUESTA
-CREATE TABLE FOR_Y_UN_IF.pregunta_encuesta (
-    pregunta_id INT IDENTITY(1,1) PRIMARY KEY,
-    pregunta_texto VARCHAR(255) NOT NULL UNIQUE
-)
-PRINT 'Tabla pregunta_encuesta creada'
-GO
-
 
 PRINT '========================================='
 PRINT 'TODAS LAS TABLAS CREADAS EXITOSAMENTE'
-PRINT 'Total: 24 tablas'
+PRINT 'Total: 26 tablas' -- Corregí el conteo, eran 26 tablas, no 24.
 PRINT '========================================='
 GO
 
 
 /*******************************************************************************
- * PARTE 7: CREACION DE INDICES - Investigar si hace falta!!!!
+ * PARTE 8: CREACION DE INDICES - Investigar si hace falta!!!!
  ******************************************************************************/
 
 PRINT '========================================='
@@ -625,7 +636,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_catalogos: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_catalogos: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -663,7 +674,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_provincia: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_provincia: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -704,7 +715,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_localidad: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_localidad: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -734,7 +745,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_institucion: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_institucion: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -780,7 +791,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_sede: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_sede: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -829,7 +840,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_profesor: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_profesor: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -839,6 +850,7 @@ GO
  * SP 7: MIGRACION DE ALUMNO
  ******************************************************************************/
 
+-- ESTA ES LA SOLUCIÓN PARA migrar_alumno
 CREATE PROCEDURE FOR_Y_UN_IF.migrar_alumno
 AS
 BEGIN
@@ -858,29 +870,38 @@ BEGIN
             alumno_telefono,
             localidad_id
         )
-        SELECT DISTINCT
+        SELECT
             m.Alumno_Legajo,
-            m.Alumno_Dni,
-            m.Alumno_Nombre,
-            m.Alumno_Apellido,
-            m.Alumno_FechaNacimiento,
-            m.Alumno_Mail,
-            m.Alumno_Direccion,
-            m.Alumno_Telefono,
-            l.localidad_id
-        FROM gd_esquema.Maestra m
-        LEFT JOIN FOR_Y_UN_IF.localidad l
-            ON m.Alumno_Localidad = l.localidad_nombre
-        LEFT JOIN FOR_Y_UN_IF.provincia p
-            ON m.Alumno_Provincia = p.provincia_nombre
-            AND l.provincia_id = p.provincia_id
-        WHERE m.Alumno_Legajo IS NOT NULL
+            MIN(m.Alumno_Dni) AS Alumno_Dni,
+            MIN(m.Alumno_Nombre) AS Alumno_Nombre,
+            MIN(m.Alumno_Apellido) AS Alumno_Apellido,
+            MIN(m.Alumno_FechaNacimiento) AS Alumno_FechaNacimiento,
+            MIN(m.Alumno_Mail) AS Alumno_Mail,
+            MIN(m.Alumno_Direccion) AS Alumno_Direccion,
+            MIN(m.Alumno_Telefono) AS Alumno_Telefono,
+            MIN(localidad_id) AS localidad_id 
+        FROM (
+            SELECT
+                ma.*,
+                l.localidad_id
+            FROM gd_esquema.Maestra ma
+            LEFT JOIN FOR_Y_UN_IF.localidad l
+                ON ma.Alumno_Localidad = l.localidad_nombre
+            LEFT JOIN FOR_Y_UN_IF.provincia p
+                ON ma.Alumno_Provincia = p.provincia_nombre
+                AND l.provincia_id = p.provincia_id
+            WHERE ma.Alumno_Legajo IS NOT NULL
+        ) AS m
+        WHERE m.Alumno_Legajo NOT IN (
+            SELECT alumno_legajo FROM FOR_Y_UN_IF.alumno
+        )
+        GROUP BY m.Alumno_Legajo;
 
         PRINT 'Alumnos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_alumno: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_alumno: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -937,7 +958,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_curso: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_curso: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -970,7 +991,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_curso_dia: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_curso_dia: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1005,7 +1026,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_modulo: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_modulo: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1047,7 +1068,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_inscripcion: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_inscripcion: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1092,7 +1113,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_evaluacion_curso: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_evaluacion_curso: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1127,7 +1148,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_trabajo_practico: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_trabajo_practico: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1164,7 +1185,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_examen_final: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_examen_final: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1205,7 +1226,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_inscripcion_final: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_inscripcion_final: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1244,7 +1265,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_evaluacion_final: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_evaluacion_final: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1283,7 +1304,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_factura: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_factura: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1325,7 +1346,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_detalle_factura: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_detalle_factura: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1364,7 +1385,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_pago: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_pago: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1418,7 +1439,7 @@ BEGIN
     BEGIN CATCH
         IF OBJECT_ID('tempdb..#EncuestasTemporal') IS NOT NULL
             DROP TABLE #EncuestasTemporal
-        PRINT 'ERROR en migrar_encuesta: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_encuesta: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1511,7 +1532,7 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        PRINT 'ERROR en migrar_respuesta_encuesta: ' + ERROR_MESSAGE()
+        PRINT 'ERROR en migrar_respuesta_encuesta: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
