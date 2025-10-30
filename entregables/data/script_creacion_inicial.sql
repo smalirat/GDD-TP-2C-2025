@@ -29,6 +29,7 @@ IF OBJECT_ID('FOR_Y_UN_IF.migrar_examen_final', 'P') IS NOT NULL DROP PROCEDURE 
 IF OBJECT_ID('FOR_Y_UN_IF.migrar_trabajo_practico', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_trabajo_practico;
 IF OBJECT_ID('FOR_Y_UN_IF.migrar_evaluacion_curso', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_evaluacion_curso;
 IF OBJECT_ID('FOR_Y_UN_IF.migrar_inscripcion', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_inscripcion;
+IF OBJECT_ID('FOR_Y_UN_IF.migrar_curso_modulo', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_curso_modulo;
 IF OBJECT_ID('FOR_Y_UN_IF.migrar_modulo', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_modulo;
 IF OBJECT_ID('FOR_Y_UN_IF.migrar_curso_dia', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_curso_dia;
 IF OBJECT_ID('FOR_Y_UN_IF.migrar_curso', 'P') IS NOT NULL DROP PROCEDURE FOR_Y_UN_IF.migrar_curso;
@@ -53,6 +54,7 @@ IF OBJECT_ID('FOR_Y_UN_IF.examen_final', 'U') IS NOT NULL DROP TABLE FOR_Y_UN_IF
 IF OBJECT_ID('FOR_Y_UN_IF.trabajo_practico', 'U') IS NOT NULL DROP TABLE FOR_Y_UN_IF.trabajo_practico;
 IF OBJECT_ID('FOR_Y_UN_IF.evaluacion_curso', 'U') IS NOT NULL DROP TABLE FOR_Y_UN_IF.evaluacion_curso;
 IF OBJECT_ID('FOR_Y_UN_IF.inscripcion', 'U') IS NOT NULL DROP TABLE FOR_Y_UN_IF.inscripcion;
+IF OBJECT_ID('FOR_Y_UN_IF.curso_modulo', 'U') IS NOT NULL DROP TABLE FOR_Y_UN_IF.curso_modulo;
 IF OBJECT_ID('FOR_Y_UN_IF.modulo', 'U') IS NOT NULL DROP TABLE FOR_Y_UN_IF.modulo;
 IF OBJECT_ID('FOR_Y_UN_IF.curso_dia', 'U') IS NOT NULL DROP TABLE FOR_Y_UN_IF.curso_dia;
 IF OBJECT_ID('FOR_Y_UN_IF.curso', 'U') IS NOT NULL DROP TABLE FOR_Y_UN_IF.curso;
@@ -273,12 +275,22 @@ GO
 CREATE TABLE FOR_Y_UN_IF.modulo (
     modulo_id INT IDENTITY(1,1) PRIMARY KEY,
     modulo_nombre VARCHAR(255) NOT NULL,
-    modulo_descripcion VARCHAR(255) NULL,
-    curso_codigo BIGINT NOT NULL,
-    CONSTRAINT FK_modulo_curso FOREIGN KEY (curso_codigo)
-        REFERENCES FOR_Y_UN_IF.curso(curso_codigo)
+    modulo_descripcion VARCHAR(255) NULL
 )
 PRINT 'Tabla modulo creada'
+GO
+
+CREATE TABLE FOR_Y_UN_IF.curso_modulo (
+    curso_modulo_id INT IDENTITY(1,1) PRIMARY KEY,
+    curso_codigo BIGINT NOT NULL,
+    modulo_id INT NOT NULL,
+    CONSTRAINT FK_curso_modulo_curso FOREIGN KEY (curso_codigo)
+        REFERENCES FOR_Y_UN_IF.curso(curso_codigo),
+    CONSTRAINT FK_curso_modulo_modulo FOREIGN KEY (modulo_id)
+        REFERENCES FOR_Y_UN_IF.modulo(modulo_id),
+    CONSTRAINT UQ_curso_modulo UNIQUE (curso_codigo, modulo_id)
+)
+PRINT 'Tabla curso_modulo creada'
 GO
 
 -- Tabla: CURSO_DIA (relación N:M, Depende de CURSO, DIA)
@@ -321,7 +333,6 @@ CREATE TABLE FOR_Y_UN_IF.inscripcion (
 PRINT 'Tabla inscripcion creada'
 GO
 
--- Tabla: EVALUACION_CURSO (Depende de INSCRIPCION, MODULO)
 CREATE TABLE FOR_Y_UN_IF.evaluacion_curso (
     evaluacion_id INT IDENTITY(1,1) PRIMARY KEY,
     evaluacion_nota BIGINT NULL,
@@ -329,14 +340,12 @@ CREATE TABLE FOR_Y_UN_IF.evaluacion_curso (
     evaluacion_instancia BIGINT NULL,
     evaluacion_presente BIT NULL,
     inscripcion_numero BIGINT NOT NULL,
-    modulo_id INT NOT NULL,
+    modulo_id INT NOT NULL,  
     CONSTRAINT FK_evaluacion_curso_inscripcion FOREIGN KEY (inscripcion_numero)
         REFERENCES FOR_Y_UN_IF.inscripcion(inscripcion_numero),
     CONSTRAINT FK_evaluacion_curso_modulo FOREIGN KEY (modulo_id)
         REFERENCES FOR_Y_UN_IF.modulo(modulo_id)
 )
-PRINT 'Tabla evaluacion_curso creada'
-GO
 
 -- Tabla: TRABAJO_PRACTICO (Depende de INSCRIPCION)
 CREATE TABLE FOR_Y_UN_IF.trabajo_practico (
@@ -495,20 +504,21 @@ GO
 
 PRINT '========================================='
 PRINT 'TODAS LAS TABLAS CREADAS EXITOSAMENTE'
-PRINT 'Total: 26 tablas' -- Corregí el conteo, eran 26 tablas, no 24.
+PRINT 'Total: 27 tablas' 
 PRINT '========================================='
 GO
 
 
 /*******************************************************************************
- * PARTE 8: CREACION DE INDICES - Investigar si hace falta!!!!
+ * PARTE 8: CREACION DE INDICES 
  ******************************************************************************/
 
 PRINT '========================================='
-PRINT 'CREANDO INDICES'
+PRINT 'CREANDO ÍNDICES'
 PRINT '========================================='
 GO
 
+-- Índices en claves foráneas (mejoran performance de JOINs)
 CREATE NONCLUSTERED INDEX IX_localidad_provincia ON FOR_Y_UN_IF.localidad(provincia_id);
 CREATE NONCLUSTERED INDEX IX_sede_localidad ON FOR_Y_UN_IF.sede(localidad_id);
 CREATE NONCLUSTERED INDEX IX_sede_institucion ON FOR_Y_UN_IF.sede(institucion_cuit);
@@ -520,7 +530,10 @@ CREATE NONCLUSTERED INDEX IX_curso_turno ON FOR_Y_UN_IF.curso(turno_id);
 CREATE NONCLUSTERED INDEX IX_curso_profesor ON FOR_Y_UN_IF.curso(profesor_dni);
 CREATE NONCLUSTERED INDEX IX_curso_dia_curso ON FOR_Y_UN_IF.curso_dia(curso_codigo);
 CREATE NONCLUSTERED INDEX IX_curso_dia_dia ON FOR_Y_UN_IF.curso_dia(dia_id);
-CREATE NONCLUSTERED INDEX IX_modulo_curso ON FOR_Y_UN_IF.modulo(curso_codigo);
+
+
+CREATE NONCLUSTERED INDEX IX_curso_modulo_curso ON FOR_Y_UN_IF.curso_modulo(curso_codigo);
+CREATE NONCLUSTERED INDEX IX_curso_modulo_modulo ON FOR_Y_UN_IF.curso_modulo(modulo_id);
 CREATE NONCLUSTERED INDEX IX_inscripcion_alumno ON FOR_Y_UN_IF.inscripcion(alumno_legajo);
 CREATE NONCLUSTERED INDEX IX_inscripcion_curso ON FOR_Y_UN_IF.inscripcion(curso_codigo);
 CREATE NONCLUSTERED INDEX IX_evaluacion_curso_inscripcion ON FOR_Y_UN_IF.evaluacion_curso(inscripcion_numero);
@@ -541,15 +554,15 @@ CREATE NONCLUSTERED INDEX IX_encuesta_curso ON FOR_Y_UN_IF.encuesta(curso_codigo
 CREATE NONCLUSTERED INDEX IX_respuesta_encuesta_encuesta ON FOR_Y_UN_IF.respuesta_encuesta(encuesta_id);
 CREATE NONCLUSTERED INDEX IX_respuesta_encuesta_pregunta ON FOR_Y_UN_IF.respuesta_encuesta(pregunta_id);
 
-PRINT 'Indices en FKs creados: 31 Indices'
+PRINT 'Índices en FKs creados: 32 índices'
 GO
 
--- Indices compuestos para consultas frecuentes
+-- Índices compuestos para consultas frecuentes
 CREATE NONCLUSTERED INDEX IX_inscripcion_alumno_curso ON FOR_Y_UN_IF.inscripcion(alumno_legajo, curso_codigo);
 CREATE NONCLUSTERED INDEX IX_detalle_factura_numero_curso ON FOR_Y_UN_IF.detalle_factura(factura_numero, curso_codigo);
 
-PRINT 'Indices compuestos creados: 2 Indices'
-PRINT 'Total Indices: 33'
+PRINT 'Índices compuestos creados: 2 índices'
+PRINT 'Total índices: 34'
 GO
 
 PRINT '========================================='
@@ -1005,28 +1018,54 @@ CREATE PROCEDURE FOR_Y_UN_IF.migrar_modulo
 AS
 BEGIN
     SET NOCOUNT ON;
-
+    
     BEGIN TRY
-        PRINT 'Migrando modulos...'
-
+        PRINT 'Migrando módulos...'
+        
         INSERT INTO FOR_Y_UN_IF.modulo (
             modulo_nombre,
-            modulo_descripcion,
-            curso_codigo
+            modulo_descripcion
         )
         SELECT DISTINCT
             m.Modulo_Nombre,
-            m.Modulo_Descripcion,
-            m.Curso_Codigo
+            m.Modulo_Descripcion
         FROM gd_esquema.Maestra m
         WHERE m.Modulo_Nombre IS NOT NULL
-          AND m.Curso_Codigo IS NOT NULL
-
-        PRINT 'Modulos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
-
+        
+        PRINT 'Módulos migrados: ' + CAST(@@ROWCOUNT AS VARCHAR)
+        
     END TRY
     BEGIN CATCH
         PRINT 'ERROR en migrar_modulo: ' + ERROR_MESSAGE();
+        THROW;
+    END CATCH
+END
+GO
+
+CREATE PROCEDURE FOR_Y_UN_IF.migrar_curso_modulo
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    BEGIN TRY
+        PRINT 'Migrando relación curso-módulo...'
+        
+        INSERT INTO FOR_Y_UN_IF.curso_modulo (curso_codigo, modulo_id)
+        SELECT DISTINCT
+            m.Curso_Codigo,
+            mo.modulo_id
+        FROM gd_esquema.Maestra m
+        JOIN FOR_Y_UN_IF.modulo mo 
+            ON m.Modulo_Nombre = mo.modulo_nombre
+            AND ISNULL(m.Modulo_Descripcion, '') = ISNULL(mo.modulo_descripcion, '')
+        WHERE m.Curso_Codigo IS NOT NULL
+          AND m.Modulo_Nombre IS NOT NULL
+        
+        PRINT 'Relaciones curso-módulo migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
+        
+    END TRY
+    BEGIN CATCH
+        PRINT 'ERROR en migrar_curso_modulo: ' + ERROR_MESSAGE();
         THROW;
     END CATCH
 END
@@ -1082,10 +1121,10 @@ CREATE PROCEDURE FOR_Y_UN_IF.migrar_evaluacion_curso
 AS
 BEGIN
     SET NOCOUNT ON;
-
+    
     BEGIN TRY
         PRINT 'Migrando evaluaciones de curso...'
-
+        
         INSERT INTO FOR_Y_UN_IF.evaluacion_curso (
             evaluacion_nota,
             evaluacion_fecha,
@@ -1094,7 +1133,7 @@ BEGIN
             inscripcion_numero,
             modulo_id
         )
-        SELECT
+        SELECT 
             m.Evaluacion_Curso_Nota,
             m.Evaluacion_Curso_fechaEvaluacion,
             m.Evaluacion_Curso_Instancia,
@@ -1102,15 +1141,15 @@ BEGIN
             m.Inscripcion_Numero,
             mo.modulo_id
         FROM gd_esquema.Maestra m
-        JOIN FOR_Y_UN_IF.modulo mo
+        JOIN FOR_Y_UN_IF.modulo mo 
             ON m.Modulo_Nombre = mo.modulo_nombre
-            AND m.Curso_Codigo = mo.curso_codigo
+            AND ISNULL(m.Modulo_Descripcion, '') = ISNULL(mo.modulo_descripcion, '')
         WHERE m.Evaluacion_Curso_fechaEvaluacion IS NOT NULL
           AND m.Inscripcion_Numero IS NOT NULL
           AND m.Modulo_Nombre IS NOT NULL
-
+        
         PRINT 'Evaluaciones de curso migradas: ' + CAST(@@ROWCOUNT AS VARCHAR)
-
+        
     END TRY
     BEGIN CATCH
         PRINT 'ERROR en migrar_evaluacion_curso: ' + ERROR_MESSAGE();
@@ -1547,9 +1586,9 @@ PRINT 'EJECUTANDO MIGRACION COMPLETA'
 PRINT '========================================='
 GO
 
--- Paso 1: Catalogos independientes
+-- Paso 1: Entidades Secundarias
 PRINT ''
-PRINT '--- PASO 1: CATALOGOS ---'
+PRINT '--- PASO 1: ENTIDADES SECUNDARIAS ---'
 EXEC FOR_Y_UN_IF.migrar_catalogos
 GO
 
